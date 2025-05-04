@@ -9,10 +9,13 @@ pub struct TPoint3<T> {
     pub z: T
 }
 
-impl<T> TPoint3<T>
+impl<T> std::ops::Sub<TPoint3<T>> for TPoint3<T>
+where T: std::ops::Sub<Output = T>
 {
-    fn new(x: T, y: T, z: T) -> TPoint3<T> {
-        TPoint3 { x, y, z }
+    type Output = TVector3<T>;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        TVector3{x: self.x - rhs.x, y: self.y - rhs.y, z: self.z - rhs.z}
     }
 }
 

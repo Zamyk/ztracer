@@ -7,6 +7,7 @@ mod sphere;
 use color::ColorRgb;
 use minifb::{Key, Window, WindowOptions};
 
+
 const WIDTH: usize = 1000;
 const HEIGHT: usize = 1000;
 
@@ -18,16 +19,16 @@ type Point3 = TPoint3<f64>;
 type Vector3 = TVector3<f64>;
 type Ray = TRay<f64>;
 
-fn get_ray_color(x: i32, y: i32, ray: Ray) -> ColorRgb {
-
+fn get_ray_color(ray: Ray) -> ColorRgb {
+    ColorRgb{r: 0.529, g: 0.808, b: 0.922}
 }
 
-fn get_ray() -> Ray {
-
+fn get_ray(x: f64, y: f64, eye: Point3) -> Ray {
+    Ray{origin: eye, direction: Point3{x, y, z: 0f64} - eye}
 }
 
-fn get_pixel() -> ColorRgb {
-    get_ray_color(0, 1, get_ray())
+fn get_pixel(x: f64, y: f64, eye: Point3) -> ColorRgb {
+    get_ray_color(get_ray(x, y, eye))
 }
 
 
@@ -52,7 +53,8 @@ fn main() {
             let x = index % WIDTH;
             let y = index / WIDTH;
             //*c = x as u32 ^ y as u32;
-            *c = ColorRgb::new(0., 0., 1.).to_u32();
+            //*c = ColorRgb::new(0., 0., 1.).to_u32();
+            *c = get_pixel(x as f64, y as f64, Point3{x: WIDTH as f64 / 2. , y: HEIGHT as f64 / 2., z: - 10.}).to_u32();
         }
 
         // We unwrap here as we want this code to exit if it fails. Real applications may want to handle this in a different way

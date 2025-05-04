@@ -4,17 +4,13 @@ use super::vector::*;
 
 #[derive(Copy, Clone, Debug)]
 pub struct ColorRgb {
-    r: f64,
-    g: f64,
-    b: f64
+    pub r: f64,
+    pub g: f64,
+    pub b: f64
 }
 
 impl ColorRgb
 {
-    pub fn new(r: f64, g: f64, b: f64) -> ColorRgb {
-        ColorRgb { r, g, b }
-    }
-
     pub fn to_u32(self) -> u32 {
         let mut ans: u32 = 0;
         ans |= ((self.r * 255.) as u32) << 16;
@@ -27,8 +23,6 @@ impl ColorRgb
 
 #[cfg(test)]
 mod tests {
-    use crate::point::Point3;
-
     #[test]
     fn add() {
 

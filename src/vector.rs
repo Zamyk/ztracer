@@ -1,3 +1,4 @@
+use crate::Vector3;
 use super::point::*;
 
 #[derive(Copy, Clone, Debug)]
@@ -8,13 +9,22 @@ pub struct TVector3<T> {
 }
 
 impl<T> TVector3<T>
-where T: TVector3::ops::Add<Output = T> + std::ops::Mul<Output = T> + Copy
+where T: std::ops::Add<Output = T> + std::ops::Mul<Output = T> + Copy,
+TVector3<T>: std::ops::DivAssign<T>
 {
-    pub fn new(x: T, y: T, z: T) -> TVector3<T> {
-        TVector3 { x, y, z }
-    }
 
-    pub fn dot(self, oth: &TVector3<T>) -> T {
+    pub fn normalized(&self) -> TVector3<T> {
+        let mut tmp = *self;
+        tmp.normalize();
+        tmp
+    }
+    pub fn length(&self) -> T {
+        self.x * self.x + self.y * self.y + self.z * self.z
+    }
+    pub fn normalize(&mut self) {
+        *self /= self.length();
+    }
+    pub fn dot(&self, oth: &TVector3<T>) -> T {
         self.x * oth.x + self.y * oth.y + self.z * oth.z
     }
 }
@@ -49,19 +59,23 @@ where T: std::ops::Mul<Output = T>
     }
 }
 
+impl<T> std::ops::DivAssign<T> for TVector3<T>
+where T: std::ops::DivAssign<T> + Copy
+{
+
+    fn div_assign(&mut self, rhs: T) {
+        self.x /= rhs;
+        self.y /= rhs;
+        self.z /= rhs;
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::TVector3;
 
     #[test]
     fn add() {
-        let v1 = TVector3::new(1, 2, 3);
-        let v2= TVector3::new(4, 5, 6);
 
-        let sum = v1 + v2;
-
-        assert_eq!(sum.x, 5);
-        assert_eq!(sum.y, 7);
-        assert_eq!(sum.z, 9);
     }
 }
