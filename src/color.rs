@@ -1,6 +1,3 @@
-use std::ops::{Add, Sub, Mul};
-
-use super::vector::*;
 
 #[derive(Copy, Clone, Debug)]
 pub struct ColorRgb {
@@ -15,7 +12,7 @@ impl ColorRgb
         let mut ans: u32 = 0;
         ans |= ((self.r * 255.) as u32) << 16;
         ans |= ((self.g * 255.) as u32) << 8;
-        ans |= ((self.b * 255.) as u32);
+        ans |= (self.b * 255.) as u32;
         ans
     }
 }
