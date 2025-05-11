@@ -29,3 +29,22 @@ impl <T: Arithmetic> TSphere<T> {
         }
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn no_intersection() {
+
+    }
+
+    #[test]
+    fn intersection_positive() {
+
+    }
+
+    #[test]
+    fn intersection_negative() {
+
+    }
+}

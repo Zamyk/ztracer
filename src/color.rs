@@ -1,4 +1,4 @@
-use std::ops::{AddAssign, Div};
+use std::ops::{AddAssign, Div, Mul, Add};
 
 #[derive(Copy, Clone, Debug)]
 pub struct ColorRgb {
@@ -6,18 +6,6 @@ pub struct ColorRgb {
     pub g: f64,
     pub b: f64
 }
-
-impl ColorRgb
-{
-    pub fn to_u32(self) -> u32 {
-        let mut ans: u32 = 0;
-        ans |= ((self.r * 255.) as u32) << 16;
-        ans |= ((self.g * 255.) as u32) << 8;
-        ans |= (self.b * 255.) as u32;
-        ans
-    }
-}
-
 impl AddAssign<ColorRgb> for ColorRgb {
     fn add_assign(&mut self, rhs: ColorRgb) {
         self.r += rhs.r;
@@ -32,7 +20,43 @@ impl Div<f64> for ColorRgb {
         ColorRgb{r: self.r / rhs, g: self.g / rhs, b: self.b / rhs}
     }
 }
+impl Mul<f64> for ColorRgb {
+    type Output = ColorRgb;
+    fn mul(self, rhs: f64) -> Self::Output {
+        ColorRgb{r: self.r * rhs, g: self.g * rhs, b: self.b * rhs}
+    }
+}
 
+impl Add<ColorRgb> for ColorRgb {
+    type Output = ColorRgb;
+    fn add(self, rhs: ColorRgb) -> Self::Output {
+        ColorRgb{r: self.r + rhs.r, g: self.g + rhs.g, b: self.b + rhs.b}
+    }
+}
+
+#[derive(Copy, Clone, Debug)]
+pub struct ColorSrgb {
+    pub r: f64,
+    pub g: f64,
+    pub b: f64
+}
+
+impl ColorSrgb
+{
+    pub fn to_u32(self) -> u32 {
+        let mut ans: u32 = 0;
+        ans |= ((self.r * 255.) as u32) << 16;
+        ans |= ((self.g * 255.) as u32) << 8;
+        ans |= (self.b * 255.) as u32;
+        ans
+    }
+}
+
+impl From<ColorRgb> for ColorSrgb {
+    fn from(value: ColorRgb) -> Self {
+        ColorSrgb{r: value.r, g: value.g, b: value.b}
+    }
+}
 
 #[cfg(test)]
 mod tests {

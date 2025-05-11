@@ -1,5 +1,5 @@
-use crate::camera::{Camera, Ray, Sphere};
-use crate::color::ColorRgb;
+use crate::camera::{Camera, Ray, Sphere, Vector3};
+use crate::color::{ColorRgb, ColorSrgb};
 use crate::hit::THit;
 use rand;
 use crate::point::TPoint2;
@@ -16,11 +16,15 @@ pub struct Renderer {
 }
 
 impl Renderer {
-    fn get_ray_color(&self, ray: Ray) -> ColorRgb {
+    fn get_ray_color(&self, ray: Ray, iterations: i32) -> ColorRgb {
+        if iterations == 0 {
+            return ColorRgb{r: 0.0, g: 0.0, b: 0.0};
+        }
+
         let mut closest_hit: Option<Hit> = None;
 
         for sphere in &self.spheres {
-            if let Some(hit) = sphere.intersect(&ray, 0.) {
+            if let Some(hit) = sphere.intersect(&ray, 0.001) {
                 closest_hit = Some(match closest_hit {
                     None => hit,
                     Some(prev) => if hit.t < prev.t { hit } else { prev },
@@ -30,9 +34,15 @@ impl Renderer {
 
         match closest_hit {
             Some(hit) => {
-                ColorRgb{r: (hit.normal.x + 1.) * 0.5, g: (hit.normal.y + 1.) * 0.5, b: (-hit.normal.z + 1.) * 0.5}
+                let next_ray = Ray{origin: hit.point, direction: Vector3::random_on_hemisphere(&mut rand::rng(), &hit.normal)};
+                self.get_ray_color(next_ray, iterations - 1) * 0.5
+                //ColorRgb{r: (hit.normal.x + 1.) * 0.5, g: (hit.normal.y + 1.) * 0.5, b: (-hit.normal.z + 1.) * 0.5}
             },
-            None => ColorRgb{r: 0.529, g: 0.808, b: 0.922}
+            //None => ColorRgb{r: 0.529, g: 0.808, b: 0.922}
+            None => {
+                let a = 0.5 * (ray.direction.normalized().y + 1.0);
+                ColorRgb{r: 1., g: 1., b: 1.} * (1.0 - a) + ColorRgb{r: 0.5, g: 0.7, b: 1.0} * a
+            }
         }
     }
 
@@ -42,7 +52,7 @@ impl Renderer {
         Point2 { x, y }
     }
 
-    pub fn get_pixel(&self, x: i32, y: i32) -> ColorRgb {
+    pub fn get_pixel(&self, x: i32, y: i32) -> ColorSrgb {
 
         let pixel_size = 2. / std::cmp::max(self.width, self.height) as f64;
         let x = -2. * x as f64 / std::cmp::max(self.width, self.height) as f64 + 1.;
@@ -55,9 +65,9 @@ impl Renderer {
 
         for _i in 0..self.samples_per_pixel {
             let p = Self::random_on_square(ll, ur);
-            ans += self.get_ray_color(self.camera.get_ray(p.x, p.y));
+            ans += self.get_ray_color(self.camera.get_ray(p.x, p.y), 10);
         }
 
-        ans / self.samples_per_pixel as f64
+        ColorSrgb::from(ans / self.samples_per_pixel as f64)
     }
 }

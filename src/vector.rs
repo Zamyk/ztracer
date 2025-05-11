@@ -1,6 +1,10 @@
 use std::ops::{Add, Sub, Mul, Div, DivAssign, Neg};
 use std::cmp::PartialOrd;
-pub trait Arithmetic: 
+use rand::Rng;
+use rand::rngs::SmallRng;
+use crate::camera::Vector3;
+
+pub trait Arithmetic:
     Add<Output = Self> + 
     Sub<Output = Self> + 
     Mul<Output = Self> +
@@ -43,6 +47,24 @@ pub struct TVector3<T: Arithmetic> {
 }
 
 impl<T: Arithmetic> TVector3<T> {
+
+    pub fn random_on_sphere<T2: rand::Rng>(rng: &mut T2) -> TVector3<T> {
+        let theta = rng.random::<f64>() * std::f64::consts::PI;
+        let phi = rng.random::<f64>() * 2. * std::f64::consts::PI;
+        let x = T::scalar(theta.sin() * phi.cos());
+        let y = T::scalar(theta.sin() * phi.sin());
+        let z = T::scalar(theta.cos());
+        TVector3{x, y, z}
+    }
+
+    pub fn random_on_hemisphere<T2: rand::Rng>(rng: &mut T2, normal: &TVector3<T>) -> TVector3<T> {
+        let v = Self::random_on_sphere(rng);
+        if normal.dot(&v) < T::scalar(0.) {
+            return v * T::scalar(-1.);
+        }
+        v
+    }
+
     pub fn normalized(&self) -> TVector3<T> {
         let mut tmp = *self;
         tmp.normalize();
