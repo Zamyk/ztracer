@@ -5,31 +5,16 @@ mod ray;
 mod sphere;
 mod camera;
 mod hit;
+mod renderer;
 
-use color::ColorRgb;
+
 use minifb::{Key, Window, WindowOptions};
-
+use renderer::Renderer;
 
 const WIDTH: usize = 1000;
 const HEIGHT: usize = 1000;
 
 use camera::*;
-
-fn get_ray_color(ray: Ray) -> ColorRgb {
-    let sphere = Sphere{center: Point3{x: 0., y: 0., z: 5.}, radius: 3.};
-    match sphere.intersect(&ray) {
-        Some(hit) => {
-           ColorRgb{r: (hit.normal.x + 1.) * 0.5, g: (hit.normal.y + 1.) * 0.5, b: (-hit.normal.z + 1.) * 0.5}
-            //ColorRgb{r: 0., g: 0., b: (hit.normal.z + 1.) * 0.5}
-        },
-        None => ColorRgb{r: 0.529, g: 0.808, b: 0.922}
-    }
-}
-
-fn get_pixel(camera: &Camera, x: f64, y: f64) -> ColorRgb {
-    get_ray_color(camera.get_ray(x, y))
-}
-
 
 fn main() {
     let mut buffer: Vec<u32> = vec![0; WIDTH * HEIGHT];
@@ -47,27 +32,19 @@ fn main() {
     // Limit to max ~60 fps update rate
     window.set_target_fps(60);
 
-    let mut camera= Camera::new(&Point3{x: 0. , y: 0., z: -1.}, &Point3{x: 0. , y: 3., z: 10.}, std::f64::consts::PI / 3.);
-    let mut z = -1.;
+    let camera= Camera::new(&Point3{x: 0. , y: 0., z: -3.}, &Point3{x: 0. , y: 0., z: 10.}, std::f64::consts::PI / 3.);
+    let sphere1 = Sphere{center: Point3{x: 0., y: 0., z: 5.}, radius: 3.};
+    let sphere2 = Sphere{center: Point3{x: 0., y: -100., z: 0.}, radius: 95.};
+    let spheres = vec![sphere1, sphere2];
+    let renderer = Renderer{camera, width: WIDTH as i32, height: HEIGHT as i32, spheres, samples_per_pixel: 1024};
 
     while window.is_open() && !window.is_key_down(Key::Escape) {
-        if window.is_key_down(Key::Down) {
-            z -= 0.1;
-            camera = Camera::new(&Point3{x: 0. , y: 0., z}, &Point3{x: 0. , y: 0., z: 10.}, std::f64::consts::PI / 4.);
-        }
-        if window.is_key_down(Key::Up) {
-            z += 0.1;
-            camera = Camera::new(&Point3{x: 0. , y: 0., z}, &Point3{x: 0. , y: 0., z: 10.}, std::f64::consts::PI / 4.);
-        }
-
         for (index, c) in buffer.iter_mut().enumerate() {
             let x = index % WIDTH;
             let y = index / WIDTH;
-            //*c = x as u32 ^ y as u32;
-            //*c = ColorRgb::new(0., 0., 1.).to_u32();
-            let y = -2. * y as f64 / std::cmp::max(WIDTH, HEIGHT) as f64 + 1.;
-            let x = -2. * x as f64 / std::cmp::max(WIDTH, HEIGHT) as f64 + 1.;
-            *c = get_pixel(&camera, x, y).to_u32();
+            // let tmp = renderer.get_pixel(x as i32, y as i32);
+            *c = renderer.get_pixel(x as i32, y as i32).to_u32();
+            //*c = ColorRgb{r: 1., g: 0., b: 0.}.to_u32();
         }
 
         // We unwrap here as we want this code to exit if it fails. Real applications may want to handle this in a different way

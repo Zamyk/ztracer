@@ -8,7 +8,7 @@ pub struct TSphere<T> {
 }
 
 impl <T: Arithmetic> TSphere<T> {
-    pub fn intersect(&self, ray: &TRay<T>) -> Option<THit<T>> {
+    pub fn intersect(&self, ray: &TRay<T>, min_t: T) -> Option<THit<T>> {
         let p = ray.origin - self.center;
         let a = ray.direction.dot(&ray.direction);
         let b = ray.direction.dot(&p) * T::scalar(2.);
@@ -20,6 +20,9 @@ impl <T: Arithmetic> TSphere<T> {
         }
         else {
             let t = (-b - discriminant.sqrt()) / (T::scalar(2.) * a);
+            if t < min_t {
+                return None;
+            }
             let point = ray.origin + ray.direction * t;
             let normal = (point - self.center) / self.radius;
             Some(THit{point, normal, t})

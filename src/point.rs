@@ -31,6 +31,13 @@ impl<T: Arithmetic> Add<TVector3<T>> for TPoint3<T> {
     }
 }
 
+
+#[derive(Copy, Clone, Debug)]
+pub struct TPoint2<T> {
+    pub x: T,
+    pub y: T,
+}
+
 #[cfg(test)]
 mod tests {
     use crate::point::TPoint3;
