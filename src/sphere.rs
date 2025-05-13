@@ -11,21 +11,26 @@ impl <T: Arithmetic> TSphere<T> {
     pub fn intersect(&self, ray: &TRay<T>, min_t: T) -> Option<THit<T>> {
         let p = ray.origin - self.center;
         let a = ray.direction.dot(&ray.direction);
-        let b = ray.direction.dot(&p) * T::scalar(2.);
+        let b = ray.direction.dot(&p);
         let c = p.dot(&p) - self.radius * self.radius;
 
-        let discriminant = b * b - T::scalar(4.) * a * c;
+        let discriminant = b * b - a * c;
         if discriminant < T::scalar(0.) {
             None
         }
         else {
-            let t = (-b - discriminant.sqrt()) / (T::scalar(2.) * a);
-            if t < min_t {
-                return None;
+            let discriminant_sqrt = discriminant.sqrt();
+            let mut root = (-b - discriminant_sqrt) / a;
+
+            if root < min_t {
+                root = (-b + discriminant_sqrt) / a;
+                if root < min_t {
+                    return None;
+                }
             }
-            let point = ray.origin + ray.direction * t;
+            let point = ray.origin + ray.direction * root;
             let normal = (point - self.center) / self.radius;
-            Some(THit{point, normal, t})
+            Some(THit{point, normal, t: root})
         }
     }
 }

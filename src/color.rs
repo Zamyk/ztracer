@@ -54,7 +54,7 @@ impl ColorSrgb
 
 impl From<ColorRgb> for ColorSrgb {
     fn from(value: ColorRgb) -> Self {
-        ColorSrgb{r: value.r, g: value.g, b: value.b}
+        ColorSrgb{r: value.r.sqrt(), g: value.g.sqrt(), b: value.b.sqrt()}
     }
 }
 

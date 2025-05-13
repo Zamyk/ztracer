@@ -34,7 +34,7 @@ impl Renderer {
 
         match closest_hit {
             Some(hit) => {
-                let next_ray = Ray{origin: hit.point, direction: Vector3::random_on_hemisphere(&mut rand::rng(), &hit.normal)};
+                let next_ray = Ray{origin: hit.point, direction: hit.normal + Vector3::random_on_sphere(&mut rand::rng())};
                 self.get_ray_color(next_ray, iterations - 1) * 0.5
                 //ColorRgb{r: (hit.normal.x + 1.) * 0.5, g: (hit.normal.y + 1.) * 0.5, b: (-hit.normal.z + 1.) * 0.5}
             },
@@ -55,8 +55,10 @@ impl Renderer {
     pub fn get_pixel(&self, x: i32, y: i32) -> ColorSrgb {
 
         let pixel_size = 2. / std::cmp::max(self.width, self.height) as f64;
-        let x = -2. * x as f64 / std::cmp::max(self.width, self.height) as f64 + 1.;
-        let y = -2. * y as f64 / std::cmp::max(self.width, self.height) as f64 + 1.;
+        let x = -2. * x as f64 / self.width as f64 + 1.;
+        let y = -2. * y as f64 / self.height as f64 + 1.;
+        let x = x * self.width as f64 / std::cmp::max(self.width, self.height) as f64;
+        let y = y * self.height as f64 / std::cmp::max(self.width, self.height) as f64;
 
         let ll = Point2{x, y};
         let ur = Point2{x: x + pixel_size, y: y + pixel_size};
@@ -65,7 +67,7 @@ impl Renderer {
 
         for _i in 0..self.samples_per_pixel {
             let p = Self::random_on_square(ll, ur);
-            ans += self.get_ray_color(self.camera.get_ray(p.x, p.y), 10);
+            ans += self.get_ray_color(self.camera.get_ray(p.x, p.y), 5);
         }
 
         ColorSrgb::from(ans / self.samples_per_pixel as f64)

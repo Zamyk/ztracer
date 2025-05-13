@@ -25,7 +25,7 @@ impl Camera {
         let up = Vector3{x: 0.0, y: 1.0, z: 0.0} ;
         let up = up - look_at * up.dot(&look_at);
         let right = look_at.cross(&up);
-        let distance = fov.tan();
+        let distance = 1. / (fov * 0.5).tan();
         Camera{eye: *position, look_at, up, right, distance}
     }
 
