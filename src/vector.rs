@@ -1,8 +1,5 @@
 use std::ops::{Add, Sub, Mul, Div, DivAssign, Neg};
 use std::cmp::PartialOrd;
-use rand::Rng;
-use rand::rngs::SmallRng;
-use crate::camera::Vector3;
 
 pub trait Arithmetic:
     Add<Output = Self> + 
@@ -85,6 +82,10 @@ impl<T: Arithmetic> TVector3<T> {
 
     pub fn cross(&self, oth: &TVector3<T>) -> TVector3<T> {
         Self{x: self.y * oth.z - self.z * oth.y, y: self.z * oth.x - self.x * oth.z, z: self.x * oth.y - self.y * oth.x}
+    }
+
+    pub fn reflect(&self, normal: &TVector3<T>) -> TVector3<T> {
+        *self - *normal * T::scalar(2.) * normal.dot(&self)
     }
 }
 

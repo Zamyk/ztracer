@@ -6,10 +6,12 @@ mod sphere;
 mod camera;
 mod hit;
 mod renderer;
-
+mod material;
 
 use minifb::{Key, Window, WindowOptions};
 use renderer::Renderer;
+use color::ColorRgb;
+use material::*;
 
 const WIDTH: usize = 1920;
 const HEIGHT: usize = 1080;
@@ -34,9 +36,14 @@ fn main() {
 
     let camera= Camera::new(&Point3{x: 0. , y: 0., z: 0.}, &Point3{x: 0. , y: 0., z: -1.}, 120f64.to_radians());
     let sphere1 = Sphere{center: Point3{x: 0., y: 0., z: -1.}, radius: 0.5};
+    let material1 = Material::Lambertian{albedo: ColorRgb{r: 0., g: 0.5, b: 0.5}};
+
     let sphere2 = Sphere{center: Point3{x: 0., y: -100.5, z: -1.}, radius: 100.};
+    let material2 = Material::Metal{albedo: ColorRgb{r: 0.9, g: 0.9, b: 0.8}};
+
     let spheres = vec![sphere1, sphere2];
-    let renderer = Renderer{camera, width: WIDTH as i32, height: HEIGHT as i32, spheres, samples_per_pixel: 10};
+    let materials: Vec<Material> = vec![material1, material2];
+    let renderer = Renderer{camera, width: WIDTH as i32, height: HEIGHT as i32, spheres, samples_per_pixel: 10, materials};
 
     while window.is_open() && !window.is_key_down(Key::Escape) {
         for (index, c) in buffer.iter_mut().enumerate() {

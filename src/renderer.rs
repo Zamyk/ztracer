@@ -1,10 +1,9 @@
-use crate::camera::{Camera, Ray, Sphere, Vector3};
+use crate::camera::{Camera, Ray, Sphere};
 use crate::color::{ColorRgb, ColorSrgb};
-use crate::hit::THit;
+use crate::material::*;
 use rand;
 use crate::point::TPoint2;
 
-type Hit = THit<f64>;
 type Point2 = TPoint2<f64>;
 
 pub struct Renderer {
@@ -12,6 +11,7 @@ pub struct Renderer {
     pub width: i32,
     pub height: i32,
     pub spheres: Vec<Sphere>,
+    pub materials: Vec<Material>,
     pub samples_per_pixel: i32,
 }
 
@@ -22,23 +22,29 @@ impl Renderer {
         }
 
         let mut closest_hit: Option<Hit> = None;
+        let mut hit_index = 0;
 
-        for sphere in &self.spheres {
+        for (i, sphere) in self.spheres.iter().enumerate() {
             if let Some(hit) = sphere.intersect(&ray, 0.001) {
                 closest_hit = Some(match closest_hit {
-                    None => hit,
-                    Some(prev) => if hit.t < prev.t { hit } else { prev },
+                    None => {hit_index = i; hit},
+                    Some(prev) => if hit.t < prev.t { hit_index = i; hit } else { prev },
                 });
             }
         }
 
         match closest_hit {
             Some(hit) => {
-                let next_ray = Ray{origin: hit.point, direction: hit.normal + Vector3::random_on_sphere(&mut rand::rng())};
-                self.get_ray_color(next_ray, iterations - 1) * 0.5
-                //ColorRgb{r: (hit.normal.x + 1.) * 0.5, g: (hit.normal.y + 1.) * 0.5, b: (-hit.normal.z + 1.) * 0.5}
+                let scatter = self.materials[hit_index].scatter(&ray, &hit);
+                match scatter {
+                    None => {
+                        return ColorRgb{r: 0.0, g: 0.0, b: 0.0};
+                    },
+                    Some((next_ray, attenuation)) => {
+                        return self.get_ray_color(next_ray, iterations - 1) * attenuation;
+                    }
+                }
             },
-            //None => ColorRgb{r: 0.529, g: 0.808, b: 0.922}
             None => {
                 let a = 0.5 * (ray.direction.normalized().y + 1.0);
                 ColorRgb{r: 1., g: 1., b: 1.} * (1.0 - a) + ColorRgb{r: 0.5, g: 0.7, b: 1.0} * a

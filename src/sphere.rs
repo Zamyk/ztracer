@@ -28,7 +28,7 @@ impl <T: Arithmetic> TSphere<T> {
                     return None;
                 }
             }
-            let point = ray.origin + ray.direction * root;
+            let point = ray.at(root);
             let normal = (point - self.center) / self.radius;
             Some(THit{point, normal, t: root})
         }

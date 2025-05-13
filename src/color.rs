@@ -34,6 +34,13 @@ impl Add<ColorRgb> for ColorRgb {
     }
 }
 
+impl Mul<ColorRgb> for ColorRgb {
+    type Output = ColorRgb;
+    fn mul(self, rhs: ColorRgb) -> Self::Output {
+        ColorRgb{r: self.r * rhs.r, g: self.g * rhs.g, b: self.b * rhs.b}
+    }
+}
+
 #[derive(Copy, Clone, Debug)]
 pub struct ColorSrgb {
     pub r: f64,
