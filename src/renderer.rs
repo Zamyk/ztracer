@@ -55,7 +55,7 @@ impl Renderer {
     pub fn get_pixel(&self, x: i32, y: i32) -> ColorSrgb {
 
         let pixel_size = 2. / std::cmp::max(self.width, self.height) as f64;
-        let x = -2. * x as f64 / self.width as f64 + 1.;
+        let x = 2. * x as f64 / self.width as f64 - 1.;
         let y = -2. * y as f64 / self.height as f64 + 1.;
         let x = x * self.width as f64 / std::cmp::max(self.width, self.height) as f64;
         let y = y * self.height as f64 / std::cmp::max(self.width, self.height) as f64;
