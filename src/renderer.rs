@@ -38,10 +38,10 @@ impl Renderer {
                 let scatter = self.materials[hit_index].scatter(&ray, &hit);
                 match scatter {
                     None => {
-                        return ColorRgb{r: 0.0, g: 0.0, b: 0.0};
+                        ColorRgb::black()
                     },
                     Some((next_ray, attenuation)) => {
-                        return self.get_ray_color(next_ray, iterations - 1) * attenuation;
+                        self.get_ray_color(next_ray, iterations - 1) * attenuation
                     }
                 }
             },

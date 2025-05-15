@@ -11,6 +11,10 @@ impl ColorRgb {
     pub fn white() -> ColorRgb {
         ColorRgb{r: 1.0, g: 1.0, b: 1.0}
     }
+    
+    pub fn black() -> ColorRgb {
+        ColorRgb{r: 0.0, g: 0.0, b: 0.0}
+    }
 }
 impl AddAssign<ColorRgb> for ColorRgb {
     fn add_assign(&mut self, rhs: ColorRgb) {
