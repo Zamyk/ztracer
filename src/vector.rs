@@ -1,63 +1,29 @@
 use std::ops::{Add, Sub, Mul, Div, DivAssign, Neg};
-use std::cmp::PartialOrd;
-
-pub trait Arithmetic:
-    Add<Output = Self> + 
-    Sub<Output = Self> + 
-    Mul<Output = Self> +
-    Div<Output = Self> +
-    DivAssign + 
-    Copy + 
-    PartialOrd +
-    Neg<Output = Self> +
-    Sized
-{
-    fn sqrt(self) -> Self;
-
-    fn scalar(value: f64) -> Self;
-}
-
-impl Arithmetic for f32 {
-    fn sqrt(self) -> Self {
-        self.sqrt()
-    }
-
-    fn scalar(value: f64) -> Self {
-        value as f32
-    }
-}
-impl Arithmetic for f64 {
-    fn sqrt(self) -> Self {
-        self.sqrt()
-    }
-
-    fn scalar(value: f64) -> Self {
-        value
-    }
-}
-
+use super::flt::FloatP;
+use num::Float;
 #[derive(Copy, Clone, Debug)]
-pub struct TVector3<T: Arithmetic> {
+pub struct TVector3<T: FloatP> {
     pub x: T,
     pub y: T,
     pub z: T
 }
 
-impl<T: Arithmetic> TVector3<T> {
+impl<T: FloatP> TVector3<T> {
 
     pub fn random_on_sphere<T2: rand::Rng>(rng: &mut T2) -> TVector3<T> {
         let theta = rng.random::<f64>() * std::f64::consts::PI;
         let phi = rng.random::<f64>() * 2. * std::f64::consts::PI;
-        let x = T::scalar(theta.sin() * phi.cos());
-        let y = T::scalar(theta.sin() * phi.sin());
-        let z = T::scalar(theta.cos());
-        TVector3{x, y, z}
+        let x = theta.sin() * phi.cos();
+        let y = theta.sin() * phi.sin();
+        let z = theta.cos();
+
+        TVector3{x: T::value(x), y: T::value(y), z: T::value(z)}
     }
 
     pub fn random_on_hemisphere<T2: rand::Rng>(rng: &mut T2, normal: &TVector3<T>) -> TVector3<T> {
         let v = Self::random_on_sphere(rng);
-        if normal.dot(&v) < T::scalar(0.) {
-            return v * T::scalar(-1.);
+        if normal.dot(&v) < T::zero() {
+            return -v;
         }
         v
     }
@@ -85,11 +51,18 @@ impl<T: Arithmetic> TVector3<T> {
     }
 
     pub fn reflect(&self, normal: &TVector3<T>) -> TVector3<T> {
-        *self - *normal * T::scalar(2.) * normal.dot(&self)
+        *self - *normal * T::value(2.) * normal.dot(&self)
+    }
+
+    pub fn refract(&self, normal: &TVector3<T>, relative_refractive: T) -> TVector3<T> {
+        let cos = Float::min(-self.dot(normal), T::one());
+        let perpendicular = (*self + *normal * cos) * relative_refractive;
+        let parallel = *normal * -(self.dot(&self) - perpendicular.dot(&perpendicular)).sqrt();
+        perpendicular + parallel
     }
 }
 
-impl<T: Arithmetic> Add<TVector3<T>> for TVector3<T>
+impl<T: FloatP> Add<TVector3<T>> for TVector3<T>
 {
     type Output = Self;
 
@@ -98,7 +71,7 @@ impl<T: Arithmetic> Add<TVector3<T>> for TVector3<T>
     }
 }
 
-impl<T: Arithmetic> Sub<TVector3<T>> for TVector3<T>
+impl<T: FloatP> Sub<TVector3<T>> for TVector3<T>
 {
     type Output = Self;
 
@@ -107,7 +80,7 @@ impl<T: Arithmetic> Sub<TVector3<T>> for TVector3<T>
     }
 }
 
-impl<T: Arithmetic> Mul<TVector3<T>> for TVector3<T>
+impl<T: FloatP> Mul<TVector3<T>> for TVector3<T>
 {
     type Output = Self;
 
@@ -116,7 +89,7 @@ impl<T: Arithmetic> Mul<TVector3<T>> for TVector3<T>
     }
 }
 
-impl<T: Arithmetic> Mul<T> for TVector3<T>
+impl<T: FloatP> Mul<T> for TVector3<T>
 {
     type Output = Self;
 
@@ -125,7 +98,7 @@ impl<T: Arithmetic> Mul<T> for TVector3<T>
     }
 }
 
-impl<T: Arithmetic> Div<T> for TVector3<T>
+impl<T: FloatP> Div<T> for TVector3<T>
 {
     type Output = Self;
 
@@ -133,12 +106,20 @@ impl<T: Arithmetic> Div<T> for TVector3<T>
         Self{x: self.x / rhs, y: self.y / rhs, z: self.z / rhs}
     }
 }
-impl<T: Arithmetic> DivAssign<T> for TVector3<T>
+impl<T: FloatP> DivAssign<T> for TVector3<T>
 {
     fn div_assign(&mut self, rhs: T) {
-        self.x /= rhs;
-        self.y /= rhs;
-        self.z /= rhs;
+        self.x = self.x / rhs;
+        self.y = self.y / rhs;
+        self.z = self.z / rhs;
+    }
+}
+
+impl<T: FloatP> Neg for TVector3<T> {
+    type Output = Self;
+
+    fn neg(self) -> Self {
+        Self{x: -self.x, y: -self.y, z: -self.z}
     }
 }
 

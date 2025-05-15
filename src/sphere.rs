@@ -1,13 +1,13 @@
 use super::point::TPoint3;
 use super::ray::TRay;
-use super::vector::Arithmetic;
 use super::hit::THit;
+use super::flt::FloatP;
 pub struct TSphere<T> {
     pub center: TPoint3<T>,
     pub radius: T,
 }
 
-impl <T: Arithmetic> TSphere<T> {
+impl <T: FloatP> TSphere<T> {
     pub fn intersect(&self, ray: &TRay<T>, min_t: T) -> Option<THit<T>> {
         let p = ray.origin - self.center;
         let a = ray.direction.dot(&ray.direction);
@@ -15,7 +15,7 @@ impl <T: Arithmetic> TSphere<T> {
         let c = p.dot(&p) - self.radius * self.radius;
 
         let discriminant = b * b - a * c;
-        if discriminant < T::scalar(0.) {
+        if discriminant < T::zero() {
             None
         }
         else {

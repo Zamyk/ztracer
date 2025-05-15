@@ -6,6 +6,12 @@ pub struct ColorRgb {
     pub g: f64,
     pub b: f64
 }
+
+impl ColorRgb {
+    pub fn white() -> ColorRgb {
+        ColorRgb{r: 1.0, g: 1.0, b: 1.0}
+    }
+}
 impl AddAssign<ColorRgb> for ColorRgb {
     fn add_assign(&mut self, rhs: ColorRgb) {
         self.r += rhs.r;
