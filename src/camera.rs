@@ -23,8 +23,8 @@ impl Camera {
     pub fn new(position: &Point3, look_at: &Point3, fov: f64) -> Self {
         let look_at = (look_at - position).normalized();
         let up = Vector3{x: 0.0, y: 1.0, z: 0.0} ;
-        let up = up - look_at * up.dot(&look_at);
-        let right = look_at.cross(&up);
+        let up = (up - look_at * up.dot(&look_at)).normalized();
+        let right = look_at.cross(&up).normalized();
         let distance = 1. / (fov * 0.5).tan();
         Camera{eye: *position, look_at, up, right, distance}
     }

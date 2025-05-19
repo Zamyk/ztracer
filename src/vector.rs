@@ -1,6 +1,6 @@
 use std::ops::{Add, Sub, Mul, Div, DivAssign, Neg};
 use super::flt::FloatP;
-use num::Float;
+
 #[derive(Copy, Clone, Debug)]
 pub struct TVector3<T: FloatP> {
     pub x: T,
@@ -11,13 +11,25 @@ pub struct TVector3<T: FloatP> {
 impl<T: FloatP> TVector3<T> {
 
     pub fn random_on_sphere<T2: rand::Rng>(rng: &mut T2) -> TVector3<T> {
-        let theta = rng.random::<f64>() * std::f64::consts::PI;
-        let phi = rng.random::<f64>() * 2. * std::f64::consts::PI;
-        let x = theta.sin() * phi.cos();
-        let y = theta.sin() * phi.sin();
-        let z = theta.cos();
+        // let theta = rng.random::<f64>() * std::f64::consts::PI;
+        // let phi = rng.random::<f64>() * 2. * std::f64::consts::PI;
+        // let x = theta.sin() * phi.cos();
+        // let y = theta.sin() * phi.sin();
+        // let z = theta.cos();
+        //
+        // TVector3{x: T::value(x), y: T::value(y), z: T::value(z)}
+        // it seems it actually isn't uniform! going to use better way instead, for now use loop from book
+        loop {
+            let x = T::value(2. * rng.random::<f64>() - 1.);
+            let y = T::value(2. * rng.random::<f64>() - 1.);
+            let z = T::value(2. * rng.random::<f64>() - 1.);
 
-        TVector3{x: T::value(x), y: T::value(y), z: T::value(z)}
+            let p = Self{x, y, z};
+            let lensq = p.dot(&p);
+            if T::value(1e-160) < lensq && lensq <= T::one() {
+                return p / lensq.sqrt();
+            }
+        }
     }
 
     pub fn random_on_hemisphere<T2: rand::Rng>(rng: &mut T2, normal: &TVector3<T>) -> TVector3<T> {
@@ -55,10 +67,15 @@ impl<T: FloatP> TVector3<T> {
     }
 
     pub fn refract(&self, normal: &TVector3<T>, relative_refractive: T) -> TVector3<T> {
-        let cos = Float::min(-self.dot(normal), T::one());
+        let cos = -self.dot(normal);
         let perpendicular = (*self + *normal * cos) * relative_refractive;
         let parallel = *normal * -(self.dot(&self) - perpendicular.dot(&perpendicular)).sqrt();
         perpendicular + parallel
+    }
+
+    pub fn near_zero(&self) -> bool {
+        let threshold = T::value(1e-8);
+        self.x.abs() < threshold && self.y.abs() < threshold && self.z.abs() < threshold
     }
 }
 

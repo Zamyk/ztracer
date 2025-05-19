@@ -73,7 +73,7 @@ impl Renderer {
 
         for _i in 0..self.samples_per_pixel {
             let p = Self::random_on_square(ll, ur);
-            ans += self.get_ray_color(self.camera.get_ray(p.x, p.y), 5);
+            ans += self.get_ray_color(self.camera.get_ray(p.x, p.y), 10);
         }
 
         ColorSrgb::from(ans / self.samples_per_pixel as f64)
