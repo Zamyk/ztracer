@@ -11,25 +11,26 @@ pub struct TVector3<T: FloatP> {
 impl<T: FloatP> TVector3<T> {
 
     pub fn random_on_sphere<T2: rand::Rng>(rng: &mut T2) -> TVector3<T> {
-        // let theta = rng.random::<f64>() * std::f64::consts::PI;
-        // let phi = rng.random::<f64>() * 2. * std::f64::consts::PI;
-        // let x = theta.sin() * phi.cos();
-        // let y = theta.sin() * phi.sin();
-        // let z = theta.cos();
-        //
-        // TVector3{x: T::value(x), y: T::value(y), z: T::value(z)}
-        // it seems it actually isn't uniform! going to use better way instead, for now use loop from book
-        loop {
-            let x = T::value(2. * rng.random::<f64>() - 1.);
-            let y = T::value(2. * rng.random::<f64>() - 1.);
-            let z = T::value(2. * rng.random::<f64>() - 1.);
+        let theta = rng.random::<f64>() * 2. * std::f64::consts::PI;
+        let phi = (1. - 2. * rng.random::<f64>()).acos();
+        let x = phi.sin() * theta.cos();
+        let y = phi.sin() * theta.sin();
+        let z = phi.cos();
 
-            let p = Self{x, y, z};
-            let lensq = p.dot(&p);
-            if T::value(1e-160) < lensq && lensq <= T::one() {
-                return p / lensq.sqrt();
-            }
-        }
+        TVector3{x: T::value(x), y: T::value(y), z: T::value(z)}
+
+        // leaving it here for eventual performance tests
+        // loop {
+        //     let x = T::value(2. * rng.random::<f64>() - 1.);
+        //     let y = T::value(2. * rng.random::<f64>() - 1.);
+        //     let z = T::value(2. * rng.random::<f64>() - 1.);
+        //
+        //     let p = Self{x, y, z};
+        //     let lensq = p.dot(&p);
+        //     if T::value(1e-160) < lensq && lensq <= T::one() {
+        //         return p / lensq.sqrt();
+        //     }
+        // }
     }
 
     pub fn random_on_hemisphere<T2: rand::Rng>(rng: &mut T2, normal: &TVector3<T>) -> TVector3<T> {
