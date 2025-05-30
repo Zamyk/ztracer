@@ -1,7 +1,6 @@
-use crate::camera::{Camera, Ray, Sphere};
+use crate::camera::{Camera};
 use crate::color::{ColorRgb, ColorSrgb};
 use rand;
-use rand::seq::index::sample;
 use crate::point::TPoint2;
 use crate::WIDTH;
 use super::scene::Scene;
@@ -15,6 +14,12 @@ pub struct Renderer {
     height: i32,
     scene: Scene,
     multithreaded: bool
+}
+
+pub struct IterativeRenderer {
+    renderer: Renderer,
+    buffer: Vec<ColorRgb>,
+    total_iterations: usize,
 }
 
 impl Renderer {
@@ -56,7 +61,7 @@ impl Renderer {
 
         for _i in 0..samples_per_pixel {
             let p = Self::random_on_square(ll, ur);
-            ans += self.scene.get_ray_color(self.camera.get_ray(p.x, p.y, &mut rand::rng()), 20);
+            ans += self.scene.get_ray_color(self.camera.get_ray(p.x, p.y, &mut rand::rng()), 50);
         }
         ans / samples_per_pixel as f64
     }
@@ -77,4 +82,24 @@ impl Renderer {
         buffer.par_chunks_mut(chunk_size).enumerate().for_each(|(index, chunk)|self.render_main_thread(chunk, index * chunk_size, samples_per_pixel));
     }
 
+}
+
+impl IterativeRenderer {
+    pub fn new(camera: Camera, width: i32, height: i32, scene: Scene, multithreaded: bool) -> Self {
+        IterativeRenderer{renderer: Renderer{ camera, width, height, scene, multithreaded }, buffer: vec![ColorRgb::black() ; (width * height) as usize], total_iterations: 0}
+    }
+
+    pub fn set_camera(&mut self, camera: Camera) {
+        self.renderer.set_camera(camera);
+        self.buffer.fill(ColorRgb::black());
+        self.total_iterations = 0;
+    }
+
+    pub fn render(& mut self, buffer: & mut Vec<u32>, samples_per_pixel: i32) {
+        self.total_iterations += 1;
+        self.renderer.render(& mut self.buffer, samples_per_pixel);
+        buffer.clear();
+        buffer.reserve(self.buffer.len());
+        buffer.extend(self.buffer.iter().map(|a| ColorSrgb::from(a.clone() / self.total_iterations as f64).to_u32()));
+    }
 }

@@ -143,7 +143,6 @@ impl<T: FloatP> Neg for TVector3<T> {
 
 #[cfg(test)]
 mod tests {
-    use super::TVector3;
 
     #[test]
     fn add() {

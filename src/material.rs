@@ -29,9 +29,17 @@ impl Material {
     }
 
     fn scatter_metal(ray: &Ray, hit: &Hit, albedo: &ColorRgb, fuzz: f64) -> Option<(Ray, ColorRgb)> {
-        let new_direction = ray.direction.reflect(&hit.normal).normalized()
+        let directed_normal =
+        if hit.normal.dot(&ray.direction) < 0. {
+            hit.normal
+        }
+        else {
+            -hit.normal
+        };
+
+        let new_direction = ray.direction.reflect(&directed_normal).normalized()
             + Vector3::random_on_sphere(&mut rand::rng()) * fuzz;
-        if new_direction.dot(&hit.normal) > 0.0 {
+        if new_direction.dot(&directed_normal) > 0.0 {
             Some((
                 Ray {
                     origin: hit.point,

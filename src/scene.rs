@@ -1,9 +1,15 @@
 use crate::camera::{Ray, Sphere};
 use crate::color::ColorRgb;
 use crate::material::{Hit, Material};
+use crate::triangle::TTriangle;
 
 pub struct Scene {
     pub spheres: Vec<Sphere>,
+    pub spheres_materials: Vec<usize>,
+
+    pub triangles: Vec<TTriangle<f64>>,
+    pub triangles_materials: Vec<usize>,
+
     pub materials: Vec<Material>,
 }
 
@@ -23,6 +29,24 @@ impl Scene {
                     Some(prev) => if hit.t < prev.t { hit_index = i; hit } else { prev },
                 });
             }
+        }
+
+        if closest_hit.is_some() {
+            hit_index = self.spheres_materials[hit_index];
+        }
+
+        let mut triangle_hit_index = self.triangles.len();
+        for (i, triangle) in self.triangles.iter().enumerate() {
+            if let Some(hit) = triangle.intersect(&ray, 0.001) {
+                closest_hit = Some(match closest_hit {
+                    None => {triangle_hit_index = i; hit},
+                    Some(prev) => if hit.t < prev.t { triangle_hit_index = i; hit } else { prev },
+                });
+            }
+        }
+
+        if triangle_hit_index != self.triangles.len() {
+            hit_index = self.triangles_materials[triangle_hit_index];
         }
 
         match closest_hit {
