@@ -19,68 +19,69 @@ use renderer::IterativeRenderer;
 use color::ColorRgb;
 use material::*;
 
-// const WIDTH: usize = 1200;
-// const HEIGHT: usize = 765;
-const WIDTH: usize = 400;
-const HEIGHT: usize = 400;
+const WIDTH: usize = 1200;
+ const HEIGHT: usize = 765;
+//const WIDTH: usize = 400;
+//const HEIGHT: usize = 400;
 
 use camera::*;
 use scene::Scene;
 use crate::triangle::TTriangle;
 
-// taken from Ray Tracing In One Weekend
-// fn big_spheres_scene() -> Scene {
-//     let ground_material = Material::Lambertian{albedo: ColorRgb{r: 0.5, g: 0.5, b: 0.5}};
-//
-//     let mut spheres = vec![];
-//     let mut materials = vec![];
-//
-//     let ground_center = Point3{x: 0., y: -1000., z: 0.};
-//     let ground_radius = 1000.;
-//     spheres.push(Sphere{center: ground_center, radius: ground_radius});
-//     materials.push(ground_material);
-//
-//     for a in -11..11 {
-//         for b in -11..11 {
-//             let choose_mat: f64 = random();
-//             let center = Point3{x: a as f64 + 0.9 * random::<f64>(), y: 0.2, z: b as f64 + 0.9 * random::<f64>()};
-//             let center = ground_center + (center - ground_center).normalized() * (ground_radius + 0.2);
-//
-//             if (center - Point3{x: 4., y: 0.2, z: 0.}).length() > 0.9 {
-//                 let sphere_material;
-//
-//                 if choose_mat < 0.8 {
-//                     // diffuse
-//                     let albedo = ColorRgb{r: random(), g: random(), b: random()};
-//                     sphere_material = Material::Lambertian{albedo};
-//                     materials.push(sphere_material);
-//                 } else if choose_mat < 0.95 {
-//                     // metal
-//                     let albedo = ColorRgb{r: random::<f64>() * 0.5 + 0.5, g: random::<f64>() * 0.5 + 0.5, b: random::<f64>() * 0.5 + 0.5};
-//                     let fuzz = random::<f64>() * 0.5;
-//                     sphere_material = Material::Metal{albedo, fuzz};
-//                     materials.push(sphere_material);
-//                 } else {
-//                     // glass
-//                     sphere_material = Material::Dielectric{refractive_index: 1.5};
-//                     materials.push(sphere_material);
-//                 }
-//                 spheres.push(Sphere{center, radius: 0.2});
-//             }
-//         }
-//     }
-//
-//     spheres.push(Sphere{center: Point3{x: 0., y: 1., z: 0.}, radius: 1.});
-//     materials.push(Material::Dielectric {refractive_index: 1.5});
-//
-//     spheres.push(Sphere{center: Point3{x: -4., y: 1., z: 0.}, radius: 1.});
-//     materials.push(Material::Lambertian {albedo: ColorRgb{r: 0.4, g: 0.2, b: 0.1}});
-//
-//     spheres.push(Sphere{center: Point3{x: 4., y: 1., z: 0.}, radius: 1.});
-//     materials.push(Material::Metal {albedo: ColorRgb{r: 0.7, g: 0.6, b: 0.5}, fuzz: 0.0});
-//
-//     Scene{spheres, materials}
-// }
+//taken from Ray Tracing In One Weekend
+fn big_spheres_scene() -> Scene {
+    let ground_material = Material::Lambertian{albedo: ColorRgb{r: 0.5, g: 0.5, b: 0.5}};
+
+    let mut spheres = vec![];
+    let mut materials = vec![];
+
+    let ground_center = Point3{x: 0., y: -1000., z: 0.};
+    let ground_radius = 1000.;
+    spheres.push(Sphere{center: ground_center, radius: ground_radius});
+    materials.push(ground_material);
+
+    for a in -11..11 {
+        for b in -11..11 {
+            let choose_mat: f64 = random();
+            let center = Point3{x: a as f64 + 0.9 * random::<f64>(), y: 0.2, z: b as f64 + 0.9 * random::<f64>()};
+            let center = ground_center + (center - ground_center).normalized() * (ground_radius + 0.2);
+
+            if (center - Point3{x: 4., y: 0.2, z: 0.}).length() > 0.9 {
+                let sphere_material;
+
+                if choose_mat < 0.8 {
+                    // diffuse
+                    let albedo = ColorRgb{r: random(), g: random(), b: random()};
+                    sphere_material = Material::Lambertian{albedo};
+                    materials.push(sphere_material);
+                } else if choose_mat < 0.95 {
+                    // metal
+                    let albedo = ColorRgb{r: random::<f64>() * 0.5 + 0.5, g: random::<f64>() * 0.5 + 0.5, b: random::<f64>() * 0.5 + 0.5};
+                    let fuzz = random::<f64>() * 0.5;
+                    sphere_material = Material::Metal{albedo, fuzz};
+                    materials.push(sphere_material);
+                } else {
+                    // glass
+                    sphere_material = Material::Dielectric{refractive_index: 1.5};
+                    materials.push(sphere_material);
+                }
+                spheres.push(Sphere{center, radius: 0.2});
+            }
+        }
+    }
+
+    spheres.push(Sphere{center: Point3{x: 0., y: 1., z: 0.}, radius: 1.});
+    materials.push(Material::Dielectric {refractive_index: 1.5});
+
+    spheres.push(Sphere{center: Point3{x: -4., y: 1., z: 0.}, radius: 1.});
+    materials.push(Material::Lambertian {albedo: ColorRgb{r: 0.4, g: 0.2, b: 0.1}});
+
+    spheres.push(Sphere{center: Point3{x: 4., y: 1., z: 0.}, radius: 1.});
+    materials.push(Material::Metal {albedo: ColorRgb{r: 0.7, g: 0.6, b: 0.5}, fuzz: 0.0});
+
+    let spheres_len = spheres.len();
+    Scene{spheres, spheres_materials: (0..spheres_len).collect(), triangles: vec![], triangles_materials: vec![], materials}
+}
 use std::fs::File;
 use std::io::BufReader;
 use wavefront_obj::obj::Primitive::Triangle;
@@ -155,7 +156,8 @@ fn main() {
     let camera= Camera::new(&Point3{x: 8. , y: 2.5, z: 3.}, &Point3{x: 0. , y: 0.1, z: 0.}, &Vector3{x: 0., y: 1., z: 0.}, 70f64.to_radians());
     //let camera= Camera::new(&Point3{x: 0. , y: 2., z: 3.}, &Point3{x: 0. , y: 0., z: 0.}, &Vector3{x: 0., y: 1., z: 0.}, 30f64.to_radians());
     //let scene = big_spheres_scene();
-    let scene = teapot();
+    //let scene = teapot();
+    let scene = big_spheres_scene();
     let mut renderer = IterativeRenderer::new(camera, WIDTH as i32, HEIGHT as i32, scene, true);
 
     let mut mouse_x = 0f32;

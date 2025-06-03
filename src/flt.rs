@@ -1,8 +1,6 @@
 use num::Float;
 pub trait FloatP: Float {
     fn value(x: f64) -> Self;
-    
-    
 }
 
 impl FloatP for f32 {
