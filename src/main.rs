@@ -11,6 +11,9 @@ mod flt;
 mod scene;
 mod triangle;
 mod obj;
+mod bvh;
+mod bbox;
+mod primitive;
 
 use std::path::Iter;
 use minifb::{Key, MouseButton, MouseMode, Window, WindowOptions};

@@ -1,7 +1,11 @@
+use crate::bbox::BBox;
 use crate::flt::FloatP;
 use crate::hit::THit;
 use crate::point::TPoint3;
+use crate::primitive::Primitive;
 use crate::ray::TRay;
+use crate::sphere::TSphere;
+use crate::vector::TVector3;
 
 pub struct TTriangle<T> {
     pub v1: TPoint3<T>,
@@ -46,6 +50,15 @@ impl <T: FloatP> TTriangle<T> {
     }
 }
 
+impl<T: FloatP> Primitive<T> for TTriangle<T> {
+    fn get_bbox(&self) -> BBox<T> {
+        BBox::from_points(&[self.v1, self.v2, self.v3])
+    }
+
+    fn intersect(&self, ray: &TRay<T>, min_t: T) -> Option<THit<T>> {
+        self.intersect(ray, min_t)
+    }
+}
 #[cfg(test)]
 mod tests {
     use rand::{random};
