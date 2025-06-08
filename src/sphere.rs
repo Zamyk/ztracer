@@ -5,6 +5,8 @@ use super::primitive::Primitive;
 use super::ray::TRay;
 use super::vector::TVector3;
 use crate::bbox::BBox;
+
+#[derive(Clone)]
 pub struct TSphere<T> {
     pub center: TPoint3<T>,
     pub radius: T,
@@ -44,13 +46,13 @@ impl<T: FloatP> TSphere<T> {
 impl<T: FloatP> Primitive<T> for TSphere<T> {
     fn get_bbox(&self) -> BBox<T> {
         BBox {
-            bottom_left: self.center
+            bl: self.center
                 - TVector3 {
                     x: self.radius,
                     y: self.radius,
                     z: self.radius,
                 },
-            upper_right: self.center
+            ur: self.center
                 + TVector3 {
                     x: self.radius,
                     y: self.radius,

@@ -1,4 +1,5 @@
 use std::ops::{Add, Sub};
+use num::traits::real::Real;
 use super::vector::{TVector3};
 use super::flt::FloatP;
 #[derive(Copy, Clone, Debug)]
@@ -6,6 +7,26 @@ pub struct TPoint3<T> {
     pub x: T,
     pub y: T,
     pub z: T
+}
+
+impl<T: FloatP> TPoint3<T> {
+
+    pub fn min(&self, other: &TPoint3<T>) -> TPoint3<T> {   
+        TPoint3{
+            x: self.x.min(other.x),
+            y: self.y.min(other.y),
+            z: self.z.min(other.z)
+        }
+    }
+    
+    pub fn max(&self, other: &TPoint3<T>) -> TPoint3<T> {
+        TPoint3{
+            x: self.x.max(other.x),
+            y: self.y.max(other.y),
+            z: self.z.max(other.z)
+        }
+    }
+
 }
 
 impl<T: FloatP> Sub<TPoint3<T>> for TPoint3<T> {

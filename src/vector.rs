@@ -116,6 +116,15 @@ impl<T: FloatP> Mul<T> for TVector3<T>
     }
 }
 
+impl<T: FloatP> Div<TVector3<T>> for TVector3<T>
+{
+    type Output = Self;
+
+    fn div(self, rhs: TVector3<T>) -> Self {
+        Self{x: self.x / rhs.x, y: self.y / rhs.y, z: self.z / rhs.z}
+    }
+}
+
 impl<T: FloatP> Div<T> for TVector3<T>
 {
     type Output = Self;

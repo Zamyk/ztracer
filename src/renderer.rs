@@ -3,7 +3,7 @@ use crate::color::{ColorRgb, ColorSrgb};
 use rand;
 use crate::point::TPoint2;
 use crate::WIDTH;
-use super::scene::Scene;
+use super::scene::{BvhScene, Scene};
 use rayon::prelude::*;
 
 type Point2 = TPoint2<f64>;
@@ -12,7 +12,7 @@ pub struct Renderer {
     camera: Camera,
     width: i32,
     height: i32,
-    scene: Scene,
+    scene: BvhScene,
     multithreaded: bool
 }
 
@@ -24,7 +24,7 @@ pub struct IterativeRenderer {
 
 impl Renderer {
 
-    pub fn new(camera: Camera, width: i32, height: i32, scene: Scene, multithreaded: bool) -> Self {
+    pub fn new(camera: Camera, width: i32, height: i32, scene: BvhScene, multithreaded: bool) -> Self {
         Self { camera, width, height, scene, multithreaded }
     }
 
@@ -85,7 +85,7 @@ impl Renderer {
 }
 
 impl IterativeRenderer {
-    pub fn new(camera: Camera, width: i32, height: i32, scene: Scene, multithreaded: bool) -> Self {
+    pub fn new(camera: Camera, width: i32, height: i32, scene: BvhScene, multithreaded: bool) -> Self {
         IterativeRenderer{renderer: Renderer{ camera, width, height, scene, multithreaded }, buffer: vec![ColorRgb::black() ; (width * height) as usize], total_iterations: 0}
     }
 

@@ -1,7 +1,50 @@
+use crate::bvh::Bvh;
 use crate::camera::{Ray, Sphere};
 use crate::color::ColorRgb;
 use crate::material::{Hit, Material};
 use crate::triangle::TTriangle;
+
+
+
+pub struct BvhScene {
+    bvh: Bvh<f64, TTriangle<f64>>,
+}
+
+impl BvhScene {
+
+    pub fn new(triangles: &[TTriangle<f64>]) -> Self {
+        BvhScene{bvh: Bvh::build(triangles.to_vec())}
+    }
+    pub fn get_ray_color(&self, ray: Ray, iterations: i32) -> ColorRgb {
+        if iterations == 0 {
+            return ColorRgb{r: 0.0, g: 0.0, b: 0.0};
+        }
+
+        let mut closest_hit: Option<Hit> = None;
+        let mut hit_index = 0;
+
+        closest_hit = self.bvh.intersect(&ray, 0.001);
+
+        match closest_hit {
+            Some(hit) => {
+                let scatter = Material::Metal{albedo: ColorRgb{r: 0.5, g: 0.1, b: 0.3}, fuzz: 0.1}.scatter(&ray, &hit);
+                match scatter {
+                    None => {
+                        ColorRgb::black()
+                    },
+                    Some((next_ray, attenuation)) => {
+                        self.get_ray_color(next_ray, iterations - 1) * attenuation
+                    }
+                }
+            },
+            None => {
+                let a = 0.5 * (ray.direction.normalized().y + 1.0);
+                ColorRgb{r: 1., g: 1., b: 1.} * (1.0 - a) + ColorRgb{r: 0.5, g: 0.7, b: 1.0} * a
+            }
+        }
+    }
+}
+
 
 pub struct Scene {
     pub spheres: Vec<Sphere>,
