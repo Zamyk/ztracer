@@ -26,7 +26,7 @@ where
 
         Self {bl: min, ur: max}
     }
-    pub fn intersect(&self, ray: &TRay<T>, interval: Interval<T>) -> bool {
+    pub fn intersect(&self, ray: &TRay<T>, min_t: T) -> bool {
         let l = (self.bl - ray.origin) / ray.direction;
         let r = (self.ur - ray.origin) / ray.direction;
 
@@ -34,7 +34,7 @@ where
         !Interval::containing(&[l.x, r.x])
             .intersection(&Interval::containing(&[l.y, r.y]))
             .intersection(&Interval::containing(&[l.z, r.z]))
-            .intersection(&interval)
+            .intersection(&Interval{min: min_t, max: T::infinity()})
             .empty()
     }
 
@@ -84,7 +84,7 @@ mod tests {
                 direction: d,
             };
 
-            assert!(b.intersect(&ray, Interval { min: 0., max: 1e9 }));
+            assert!(b.intersect(&ray, 0.));
         }
     }
 
@@ -119,7 +119,7 @@ mod tests {
                 direction: d,
             };
 
-            assert!(!b.intersect(&ray, Interval { min: 0., max: 1e9 }));
+            assert!(!b.intersect(&ray, 0.));
         }
     }
 }
