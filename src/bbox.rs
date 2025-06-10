@@ -1,8 +1,6 @@
 use super::flt::FloatP;
 use super::point::TPoint3;
 use super::ray::TRay;
-use crate::camera::Vector3;
-pub use crate::interval::Interval;
 use crate::vector::TVector3;
 
 #[derive(Clone, Copy)]

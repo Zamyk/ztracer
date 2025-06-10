@@ -1,4 +1,4 @@
-use super::scene::{BvhScene, Scene};
+use super::scene::BvhScene;
 use crate::WIDTH;
 use crate::camera::Camera;
 use crate::color::{ColorRgb, ColorSrgb};
@@ -23,22 +23,6 @@ pub struct IterativeRenderer {
 }
 
 impl Renderer {
-    pub fn new(
-        camera: Camera,
-        width: i32,
-        height: i32,
-        scene: BvhScene,
-        multithreaded: bool,
-    ) -> Self {
-        Self {
-            camera,
-            width,
-            height,
-            scene,
-            multithreaded,
-        }
-    }
-
     pub fn set_camera(&mut self, camera: Camera) {
         self.camera = camera;
     }

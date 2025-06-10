@@ -26,10 +26,8 @@ use renderer::IterativeRenderer;
 const WIDTH: usize = 1200;
 const HEIGHT: usize = 765;
 
-use crate::bvh::Bvh;
 use crate::scene::{BvhScene, SceneBuilder};
 use camera::*;
-use scene::Scene;
 
 fn dragon_scene() -> (BvhScene, (f64, f64, f64), Point3) {
     match std::env::current_dir() {
@@ -262,14 +260,6 @@ fn big_spheres_scene() -> (BvhScene, (f64, f64, f64), Point3) {
 }
 
 fn teapot_and_spheres() -> (BvhScene, (f64, f64, f64), Point3) {
-    let material = Material::Metal {
-        albedo: ColorRgb {
-            r: 0.8,
-            g: 0.8,
-            b: 0.9,
-        },
-        fuzz: 0.,
-    };
     match std::env::current_dir() {
         Ok(path) => println!("Current working directory: {}", path.display()),
         Err(e) => eprintln!("Error getting current directory: {}", e),
@@ -365,7 +355,6 @@ fn teapot_and_spheres() -> (BvhScene, (f64, f64, f64), Point3) {
     )
 }
 
-
 struct RotateCamera {
     phi: f32,
     theta: f32,
@@ -375,7 +364,11 @@ struct RotateCamera {
 
 impl std::fmt::Display for RotateCamera {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{} {} {} {} {} {}", self.phi, self.theta, self.dist, self.position.x, self.position.y, self.position.z)
+        write!(
+            f,
+            "{} {} {} {} {} {}",
+            self.phi, self.theta, self.dist, self.position.x, self.position.y, self.position.z
+        )
     }
 }
 
@@ -435,7 +428,7 @@ fn main() {
     std::io::stdin().read_line(&mut s).unwrap();
 
     let input = s.trim(); // Trim whitespace and newlines from the input
-    let (scene, (phi, theta, dist),  pos) = if input == "a" {
+    let (scene, (phi, theta, dist), pos) = if input == "a" {
         dragon_scene()
     } else if input.chars().next() == Some('b') {
         big_spheres_scene()
@@ -501,7 +494,7 @@ fn main() {
             renderer.render(&mut buffer, 1);
         }
         let elapsed = now.elapsed();
-        //println!("Elapsed: {:.2?}", elapsed);
+        println!("Elapsed: {:.2?}", elapsed);
 
         window.update_with_buffer(&buffer, WIDTH, HEIGHT).unwrap();
     }

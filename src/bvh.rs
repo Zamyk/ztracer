@@ -3,8 +3,6 @@ use super::hit::THit;
 use super::primitive::{MaterialId, Primitive};
 use super::ray::TRay;
 use crate::bbox::BBox;
-use crate::camera::Point3;
-use crate::interval::Interval;
 use crate::point::TPoint3;
 
 #[derive(Copy, Clone)]

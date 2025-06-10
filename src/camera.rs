@@ -33,26 +33,27 @@ impl Camera {
         }
     }
 
-    pub fn new_defocus_blur(
-        position: &Point3,
-        look_at: &Point3,
-        up: &Vector3,
-        fov: f64,
-        focus_distance: f64,
-    ) -> Self {
-        let look_at = (look_at - position).normalized();
-        let up = (*up - look_at * up.dot(&look_at)).normalized();
-        let right = look_at.cross(&up).normalized();
-        let size = (fov * 0.5).tan() * focus_distance;
-        Camera {
-            eye: *position,
-            look_at,
-            up: up * size,
-            right: right * size,
-            blur_radius: 0.2,
-            focus_distance,
-        }
-    }
+    // todo!
+    // pub fn new_defocus_blur(
+    //     position: &Point3,
+    //     look_at: &Point3,
+    //     up: &Vector3,
+    //     fov: f64,
+    //     focus_distance: f64,
+    // ) -> Self {
+    //     let look_at = (look_at - position).normalized();
+    //     let up = (*up - look_at * up.dot(&look_at)).normalized();
+    //     let right = look_at.cross(&up).normalized();
+    //     let size = (fov * 0.5).tan() * focus_distance;
+    //     Camera {
+    //         eye: *position,
+    //         look_at,
+    //         up: up * size,
+    //         right: right * size,
+    //         blur_radius: 0.2,
+    //         focus_distance,
+    //     }
+    // }
     pub fn get_ray<T2: rand::Rng>(&self, x: f64, y: f64, rng: &mut T2) -> Ray {
         Ray::new(
             self.eye + self.random_in_disk(rng) * self.blur_radius,

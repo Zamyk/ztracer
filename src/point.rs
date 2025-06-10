@@ -1,6 +1,5 @@
 use super::flt::FloatP;
 use super::vector::TVector3;
-use num::traits::real::Real;
 use std::ops::{Add, Sub};
 #[derive(Copy, Clone, Debug)]
 pub struct TPoint3<T> {

@@ -1,3 +1,5 @@
+#![allow(unused)] // todo!
+
 use crate::flt::FloatP;
 
 #[derive(Copy, Clone)]
