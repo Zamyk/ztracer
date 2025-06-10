@@ -21,6 +21,11 @@ W głównym katalogu znajdują się już wyrenderowane przykładowe sceny
 
 Jak użyć?
 
+
+cargo run --release
+
+Koniecznie release, bo inaczej będzie strasznie wolne!
+
 Wystarczy wyłączyć program i wybrać jedną z trzech scen, można obracać kamerą przytrzymując lewy przycisk myszy oraz przybliżać i oddalać rolką
 
 a - trzy smoki - wolna scena - u mnie około jedna klatka na sekundę, trzeba być cierpliwym :)
