@@ -1,19 +1,27 @@
-use std::ops::{AddAssign, Div, Mul, Add};
+use std::ops::{Add, AddAssign, Div, Mul};
 
 #[derive(Copy, Clone, Debug)]
 pub struct ColorRgb {
     pub r: f64,
     pub g: f64,
-    pub b: f64
+    pub b: f64,
 }
 
 impl ColorRgb {
     pub fn white() -> ColorRgb {
-        ColorRgb{r: 1.0, g: 1.0, b: 1.0}
+        ColorRgb {
+            r: 1.0,
+            g: 1.0,
+            b: 1.0,
+        }
     }
-    
+
     pub fn black() -> ColorRgb {
-        ColorRgb{r: 0.0, g: 0.0, b: 0.0}
+        ColorRgb {
+            r: 0.0,
+            g: 0.0,
+            b: 0.0,
+        }
     }
 }
 impl AddAssign<ColorRgb> for ColorRgb {
@@ -27,27 +35,43 @@ impl AddAssign<ColorRgb> for ColorRgb {
 impl Div<f64> for ColorRgb {
     type Output = ColorRgb;
     fn div(self, rhs: f64) -> Self::Output {
-        ColorRgb{r: self.r / rhs, g: self.g / rhs, b: self.b / rhs}
+        ColorRgb {
+            r: self.r / rhs,
+            g: self.g / rhs,
+            b: self.b / rhs,
+        }
     }
 }
 impl Mul<f64> for ColorRgb {
     type Output = ColorRgb;
     fn mul(self, rhs: f64) -> Self::Output {
-        ColorRgb{r: self.r * rhs, g: self.g * rhs, b: self.b * rhs}
+        ColorRgb {
+            r: self.r * rhs,
+            g: self.g * rhs,
+            b: self.b * rhs,
+        }
     }
 }
 
 impl Add<ColorRgb> for ColorRgb {
     type Output = ColorRgb;
     fn add(self, rhs: ColorRgb) -> Self::Output {
-        ColorRgb{r: self.r + rhs.r, g: self.g + rhs.g, b: self.b + rhs.b}
+        ColorRgb {
+            r: self.r + rhs.r,
+            g: self.g + rhs.g,
+            b: self.b + rhs.b,
+        }
     }
 }
 
 impl Mul<ColorRgb> for ColorRgb {
     type Output = ColorRgb;
     fn mul(self, rhs: ColorRgb) -> Self::Output {
-        ColorRgb{r: self.r * rhs.r, g: self.g * rhs.g, b: self.b * rhs.b}
+        ColorRgb {
+            r: self.r * rhs.r,
+            g: self.g * rhs.g,
+            b: self.b * rhs.b,
+        }
     }
 }
 
@@ -55,11 +79,10 @@ impl Mul<ColorRgb> for ColorRgb {
 pub struct ColorSrgb {
     pub r: f64,
     pub g: f64,
-    pub b: f64
+    pub b: f64,
 }
 
-impl ColorSrgb
-{
+impl ColorSrgb {
     pub fn to_u32(self) -> u32 {
         let mut ans: u32 = 0;
         ans |= ((self.r * 255.) as u32) << 16;
@@ -71,14 +94,16 @@ impl ColorSrgb
 
 impl From<ColorRgb> for ColorSrgb {
     fn from(value: ColorRgb) -> Self {
-        ColorSrgb{r: value.r.sqrt(), g: value.g.sqrt(), b: value.b.sqrt()}
+        ColorSrgb {
+            r: value.r.sqrt(),
+            g: value.g.sqrt(),
+            b: value.b.sqrt(),
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
     #[test]
-    fn add() {
-
-    }
+    fn add() {}
 }

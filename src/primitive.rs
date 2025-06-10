@@ -1,7 +1,7 @@
-use crate::flt::FloatP;
-use super::ray::TRay;
 use super::bbox::BBox;
 use super::hit::THit;
+use super::ray::TRay;
+use crate::flt::FloatP;
 
 pub type MaterialId = usize;
 pub trait Primitive<T: FloatP>: Clone {

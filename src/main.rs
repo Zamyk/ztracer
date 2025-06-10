@@ -6,6 +6,7 @@ mod flt;
 mod hit;
 mod interval;
 mod material;
+mod matrix;
 mod obj;
 mod point;
 mod primitive;
@@ -40,17 +41,67 @@ fn dragon_scene() -> (BvhScene, Point3) {
     let triangles = obj::parse(obj_file_path.to_str().unwrap()).unwrap();
 
     let mut builder = SceneBuilder::empty();
-    let dragon_material = builder.add_material(Material::Metal {
+    let dragon_material1 = builder.add_material(Material::Dielectric {
+        refractive_index: 1.5,
+    });
+    for t in &triangles {
+        builder.add_triangle(t.clone(), dragon_material1);
+    }
+
+    let dragon_material2 = builder.add_material(Material::Metal {
+        albedo: ColorRgb {
+            r: 0.698,
+            g: 0.569,
+            b: 0.275,
+        },
+        fuzz: 0.1,
+    });
+
+    for t in &triangles {
+        let mut nt = t.clone();
+        nt.v1.z -= 10.;
+        nt.v2.z -= 10.;
+        nt.v3.z -= 10.;
+
+        builder.add_triangle(nt, dragon_material2);
+    }
+
+    let dragon_material3 = builder.add_material(Material::Lambertian {
+        albedo: ColorRgb {
+            r: 0.3,
+            g: 0.8,
+            b: 0.3,
+        },
+    });
+    for t in &triangles {
+        let mut nt = t.clone();
+        nt.v1.z += 10.;
+        nt.v2.z += 10.;
+        nt.v3.z += 10.;
+        builder.add_triangle(nt, dragon_material3);
+    }
+
+    let ground_material = builder.add_material(Material::Lambertian {
         albedo: ColorRgb {
             r: 0.5,
             g: 0.5,
             b: 0.5,
         },
-        fuzz: 0.,
     });
-    for t in triangles {
-        builder.add_triangle(t, dragon_material);
-    }
+    let ground_center = Point3 {
+        x: 0.,
+        y: -10000.,
+        z: 0.,
+    };
+    let ground_radius = 10000.;
+
+    builder.add_sphere(
+        Sphere {
+            center: ground_center,
+            radius: ground_radius,
+        },
+        ground_material,
+    );
 
     (
         builder.build(),
@@ -370,9 +421,8 @@ fn main() {
     println!("b - lots of spheres");
     println!("c (or anything) - teapot");
 
-    //let mut s = String::new();
-    //std::io::stdin().read_line(&mut s).unwrap();
-    let mut s = "b";
+    let mut s = String::new();
+    std::io::stdin().read_line(&mut s).unwrap();
 
     let input = s.trim(); // Trim whitespace and newlines from the input
     let (scene, pos) = if input == "a" {
@@ -382,7 +432,6 @@ fn main() {
     } else {
         teapot_and_spheres()
     };
-
 
     let mut rot = RotateCamera {
         phi: 0.,

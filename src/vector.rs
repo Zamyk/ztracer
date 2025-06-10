@@ -1,15 +1,14 @@
-use std::ops::{Add, Sub, Mul, Div, DivAssign, Neg};
 use super::flt::FloatP;
+use std::ops::{Add, Div, DivAssign, Mul, Neg, Sub};
 
 #[derive(Copy, Clone, Debug)]
-pub struct TVector3<T: FloatP> {
+pub struct TVector3<T> {
     pub x: T,
     pub y: T,
-    pub z: T
+    pub z: T,
 }
 
 impl<T: FloatP> TVector3<T> {
-
     pub fn random_on_sphere<T2: rand::Rng>(rng: &mut T2) -> TVector3<T> {
         let theta = rng.random::<f64>() * 2. * std::f64::consts::PI;
         let phi = (1. - 2. * rng.random::<f64>()).acos();
@@ -17,7 +16,11 @@ impl<T: FloatP> TVector3<T> {
         let y = phi.sin() * theta.sin();
         let z = phi.cos();
 
-        TVector3{x: T::value(x), y: T::value(y), z: T::value(z)}
+        TVector3 {
+            x: T::value(x),
+            y: T::value(y),
+            z: T::value(z),
+        }
 
         // leaving it here for eventual performance tests
         // loop {
@@ -60,7 +63,11 @@ impl<T: FloatP> TVector3<T> {
     }
 
     pub fn cross(&self, oth: &TVector3<T>) -> TVector3<T> {
-        Self{x: self.y * oth.z - self.z * oth.y, y: self.z * oth.x - self.x * oth.z, z: self.x * oth.y - self.y * oth.x}
+        Self {
+            x: self.y * oth.z - self.z * oth.y,
+            y: self.z * oth.x - self.x * oth.z,
+            z: self.x * oth.y - self.y * oth.x,
+        }
     }
 
     pub fn reflect(&self, normal: &TVector3<T>) -> TVector3<T> {
@@ -80,61 +87,78 @@ impl<T: FloatP> TVector3<T> {
     }
 }
 
-impl<T: FloatP> Add<TVector3<T>> for TVector3<T>
-{
+impl<T: FloatP> Add<TVector3<T>> for TVector3<T> {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self {
-        Self{x: self.x + rhs.x, y: self.y + rhs.y, z: self.z + rhs.z}
+        Self {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
+        }
     }
 }
 
-impl<T: FloatP> Sub<TVector3<T>> for TVector3<T>
-{
+impl<T: FloatP> Sub<TVector3<T>> for TVector3<T> {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self {
-        Self{x: self.x - rhs.x, y: self.y - rhs.y, z: self.z - rhs.z}
+        Self {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
+        }
     }
 }
 
-impl<T: FloatP> Mul<TVector3<T>> for TVector3<T>
-{
+impl<T: FloatP> Mul<TVector3<T>> for TVector3<T> {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self {
-        Self{x: self.x * rhs.x, y: self.y * rhs.y, z: self.z * rhs.z}
+        Self {
+            x: self.x * rhs.x,
+            y: self.y * rhs.y,
+            z: self.z * rhs.z,
+        }
     }
 }
 
-impl<T: FloatP> Mul<T> for TVector3<T>
-{
+impl<T: FloatP> Mul<T> for TVector3<T> {
     type Output = Self;
 
     fn mul(self, rhs: T) -> Self {
-        Self{x: self.x * rhs, y: self.y * rhs, z: self.z * rhs}
+        Self {
+            x: self.x * rhs,
+            y: self.y * rhs,
+            z: self.z * rhs,
+        }
     }
 }
 
-impl<T: FloatP> Div<TVector3<T>> for TVector3<T>
-{
+impl<T: FloatP> Div<TVector3<T>> for TVector3<T> {
     type Output = Self;
 
     fn div(self, rhs: TVector3<T>) -> Self {
-        Self{x: self.x / rhs.x, y: self.y / rhs.y, z: self.z / rhs.z}
+        Self {
+            x: self.x / rhs.x,
+            y: self.y / rhs.y,
+            z: self.z / rhs.z,
+        }
     }
 }
 
-impl<T: FloatP> Div<T> for TVector3<T>
-{
+impl<T: FloatP> Div<T> for TVector3<T> {
     type Output = Self;
 
     fn div(self, rhs: T) -> Self {
-        Self{x: self.x / rhs, y: self.y / rhs, z: self.z / rhs}
+        Self {
+            x: self.x / rhs,
+            y: self.y / rhs,
+            z: self.z / rhs,
+        }
     }
 }
-impl<T: FloatP> DivAssign<T> for TVector3<T>
-{
+impl<T: FloatP> DivAssign<T> for TVector3<T> {
     fn div_assign(&mut self, rhs: T) {
         self.x = self.x / rhs;
         self.y = self.y / rhs;
@@ -146,7 +170,11 @@ impl<T: FloatP> Neg for TVector3<T> {
     type Output = Self;
 
     fn neg(self) -> Self {
-        Self{x: -self.x, y: -self.y, z: -self.z}
+        Self {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+        }
     }
 }
 
@@ -154,7 +182,5 @@ impl<T: FloatP> Neg for TVector3<T> {
 mod tests {
 
     #[test]
-    fn add() {
-
-    }
+    fn add() {}
 }

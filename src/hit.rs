@@ -1,5 +1,5 @@
-use super::vector::{TVector3};
 use super::point::TPoint3;
+use super::vector::TVector3;
 use crate::flt::FloatP;
 
 pub struct THit<T: FloatP> {

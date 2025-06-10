@@ -6,8 +6,10 @@ pub struct Interval<T> {
     pub max: T,
 }
 
-impl<T> Interval<T> where T: FloatP {
-
+impl<T> Interval<T>
+where
+    T: FloatP,
+{
     pub fn containing(vals: &[T]) -> Self {
         let mut min = vals[0];
         let mut max = vals[0];
@@ -15,30 +17,32 @@ impl<T> Interval<T> where T: FloatP {
         for v in vals {
             if *v < min {
                 min = *v;
-            }
-            else if *v > max {
+            } else if *v > max {
                 max = *v;
             }
         }
 
-        Self {min, max}
+        Self { min, max }
     }
 
     pub fn union(&self, oth: &Self) -> Self {
-        Interval{min: self.min.min(oth.min), max: self.max.max(oth.max)}
+        Interval {
+            min: self.min.min(oth.min),
+            max: self.max.max(oth.max),
+        }
     }
 
     pub fn intersection(&self, oth: &Self) -> Self {
-        Interval{min: self.min.max(oth.min), max: self.max.min(oth.max)}
+        Interval {
+            min: self.min.max(oth.min),
+            max: self.max.min(oth.max),
+        }
     }
 
     pub fn empty(&self) -> bool {
         self.max <= self.min
     }
-
 }
-
-
 
 #[cfg(test)]
 mod tests {
@@ -68,8 +72,8 @@ mod tests {
 
     #[test]
     fn union() {
-        let i1 = Interval{min:10., max:20.};
-        let i2 = Interval{min:12., max:22.};
+        let i1 = Interval { min: 10., max: 20. };
+        let i2 = Interval { min: 12., max: 22. };
 
         let i3 = i1.union(&i2);
 
@@ -78,8 +82,8 @@ mod tests {
 
     #[test]
     fn union_disjoint() {
-        let i1 = Interval{min:10., max:20.};
-        let i2 = Interval{min:0., max:4.};
+        let i1 = Interval { min: 10., max: 20. };
+        let i2 = Interval { min: 0., max: 4. };
 
         let i3 = i1.union(&i2);
 
@@ -88,8 +92,8 @@ mod tests {
 
     #[test]
     fn intersection() {
-        let i1 = Interval{min:10., max:20.};
-        let i2 = Interval{min:12., max:22.};
+        let i1 = Interval { min: 10., max: 20. };
+        let i2 = Interval { min: 12., max: 22. };
 
         let i3 = i1.intersection(&i2);
 

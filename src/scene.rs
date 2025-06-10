@@ -15,7 +15,13 @@ pub struct SceneBuilder {
 
 impl SceneBuilder {
     pub fn empty() -> SceneBuilder {
-        SceneBuilder{materials: vec![], triangles: vec![], triangles_materials: vec![], spheres: vec![], spheres_materials: vec![]}
+        SceneBuilder {
+            materials: vec![],
+            triangles: vec![],
+            triangles_materials: vec![],
+            spheres: vec![],
+            spheres_materials: vec![],
+        }
     }
 
     pub fn add_triangle(&mut self, triangle: TTriangle<f64>, material: MaterialId) {
@@ -34,9 +40,14 @@ impl SceneBuilder {
     }
 
     pub fn build(self) -> BvhScene {
-        BvhScene::new(self.materials, self.triangles, self.triangles_materials, self.spheres, self.spheres_materials)
+        BvhScene::new(
+            self.materials,
+            self.triangles,
+            self.triangles_materials,
+            self.spheres,
+            self.spheres_materials,
+        )
     }
-
 }
 
 pub struct BvhScene {
@@ -46,14 +57,27 @@ pub struct BvhScene {
 }
 
 impl BvhScene {
-
-    pub fn new(materials: Vec<Material>, triangles: Vec<TTriangle<f64>>, triangles_materials: Vec<MaterialId>, spheres: Vec<Sphere>, spheres_materials: Vec<MaterialId>) -> Self {
-        BvhScene{materials, triangles: Bvh::build(triangles, triangles_materials), spheres: Bvh::build(spheres, spheres_materials)}
+    pub fn new(
+        materials: Vec<Material>,
+        triangles: Vec<TTriangle<f64>>,
+        triangles_materials: Vec<MaterialId>,
+        spheres: Vec<Sphere>,
+        spheres_materials: Vec<MaterialId>,
+    ) -> Self {
+        BvhScene {
+            materials,
+            triangles: Bvh::build(triangles, triangles_materials),
+            spheres: Bvh::build(spheres, spheres_materials),
+        }
     }
 
     pub fn get_ray_color(&self, ray: Ray, iterations: i32) -> ColorRgb {
         if iterations == 0 {
-            return ColorRgb{r: 0.0, g: 0.0, b: 0.0};
+            return ColorRgb {
+                r: 0.0,
+                g: 0.0,
+                b: 0.0,
+            };
         }
 
         let mut closest_hit = None;
@@ -63,42 +87,41 @@ impl BvhScene {
 
         if hit1.is_none() {
             closest_hit = hit2;
-        }
-        else if hit2.is_none() {
+        } else if hit2.is_none() {
             closest_hit = hit1;
-        }
-        else {
+        } else {
             let h1 = hit1.unwrap();
             let h2 = hit2.unwrap();
 
-            closest_hit = if h1.0.t < h2.0.t {
-                Some(h1)
-            }
-            else {
-                Some(h2)
-            }
+            closest_hit = if h1.0.t < h2.0.t { Some(h1) } else { Some(h2) }
         }
 
         match closest_hit {
             Some((hit, id)) => {
                 let scatter = self.materials[id].scatter(&ray, &hit);
                 match scatter {
-                    None => {
-                        ColorRgb::black()
-                    },
+                    None => ColorRgb::black(),
                     Some((next_ray, attenuation)) => {
                         self.get_ray_color(next_ray, iterations - 1) * attenuation
                     }
                 }
-            },
+            }
             None => {
                 let a = 0.5 * (ray.direction.normalized().y + 1.0);
-                ColorRgb{r: 1., g: 1., b: 1.} * (1.0 - a) + ColorRgb{r: 0.5, g: 0.7, b: 1.0} * a
+                ColorRgb {
+                    r: 1.,
+                    g: 1.,
+                    b: 1.,
+                } * (1.0 - a)
+                    + ColorRgb {
+                        r: 0.5,
+                        g: 0.7,
+                        b: 1.0,
+                    } * a
             }
         }
     }
 }
-
 
 pub struct Scene {
     pub spheres: Vec<Sphere>,
@@ -113,7 +136,11 @@ pub struct Scene {
 impl Scene {
     pub fn get_ray_color(&self, ray: Ray, iterations: i32) -> ColorRgb {
         if iterations == 0 {
-            return ColorRgb{r: 0.0, g: 0.0, b: 0.0};
+            return ColorRgb {
+                r: 0.0,
+                g: 0.0,
+                b: 0.0,
+            };
         }
 
         let mut closest_hit: Option<Hit> = None;
@@ -122,8 +149,18 @@ impl Scene {
         for (i, sphere) in self.spheres.iter().enumerate() {
             if let Some(hit) = sphere.intersect(&ray, 0.001) {
                 closest_hit = Some(match closest_hit {
-                    None => {hit_index = i; hit},
-                    Some(prev) => if hit.t < prev.t { hit_index = i; hit } else { prev },
+                    None => {
+                        hit_index = i;
+                        hit
+                    }
+                    Some(prev) => {
+                        if hit.t < prev.t {
+                            hit_index = i;
+                            hit
+                        } else {
+                            prev
+                        }
+                    }
                 });
             }
         }
@@ -136,8 +173,18 @@ impl Scene {
         for (i, triangle) in self.triangles.iter().enumerate() {
             if let Some(hit) = triangle.intersect(&ray, 0.001) {
                 closest_hit = Some(match closest_hit {
-                    None => {triangle_hit_index = i; hit},
-                    Some(prev) => if hit.t < prev.t { triangle_hit_index = i; hit } else { prev },
+                    None => {
+                        triangle_hit_index = i;
+                        hit
+                    }
+                    Some(prev) => {
+                        if hit.t < prev.t {
+                            triangle_hit_index = i;
+                            hit
+                        } else {
+                            prev
+                        }
+                    }
                 });
             }
         }
@@ -150,17 +197,24 @@ impl Scene {
             Some(hit) => {
                 let scatter = self.materials[hit_index].scatter(&ray, &hit);
                 match scatter {
-                    None => {
-                        ColorRgb::black()
-                    },
+                    None => ColorRgb::black(),
                     Some((next_ray, attenuation)) => {
                         self.get_ray_color(next_ray, iterations - 1) * attenuation
                     }
                 }
-            },
+            }
             None => {
                 let a = 0.5 * (ray.direction.normalized().y + 1.0);
-                ColorRgb{r: 1., g: 1., b: 1.} * (1.0 - a) + ColorRgb{r: 0.5, g: 0.7, b: 1.0} * a
+                ColorRgb {
+                    r: 1.,
+                    g: 1.,
+                    b: 1.,
+                } * (1.0 - a)
+                    + ColorRgb {
+                        r: 0.5,
+                        g: 0.7,
+                        b: 1.0,
+                    } * a
             }
         }
     }
