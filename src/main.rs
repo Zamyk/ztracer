@@ -31,7 +31,7 @@ use crate::scene::{BvhScene, SceneBuilder};
 use camera::*;
 use scene::Scene;
 
-fn dragon_scene() -> (BvhScene, Point3) {
+fn dragon_scene() -> (BvhScene, (f64, f64, f64), Point3) {
     match std::env::current_dir() {
         Ok(path) => println!("Current working directory: {}", path.display()),
         Err(e) => eprintln!("Error getting current directory: {}", e),
@@ -105,6 +105,7 @@ fn dragon_scene() -> (BvhScene, Point3) {
 
     (
         builder.build(),
+        (2.63, 0.2784314, 37.6),
         Point3 {
             x: 0.,
             y: 3.,
@@ -114,7 +115,7 @@ fn dragon_scene() -> (BvhScene, Point3) {
 }
 
 // taken from Ray Tracing In One Weekend
-fn big_spheres_scene() -> (BvhScene, Point3) {
+fn big_spheres_scene() -> (BvhScene, (f64, f64, f64), Point3) {
     let ground_center = Point3 {
         x: 0.,
         y: -1000.,
@@ -251,6 +252,7 @@ fn big_spheres_scene() -> (BvhScene, Point3) {
 
     (
         scene_builder.build(),
+        (1.5799999, 0.30588236, 13.),
         Point3 {
             x: 0.,
             y: 0.,
@@ -259,7 +261,7 @@ fn big_spheres_scene() -> (BvhScene, Point3) {
     )
 }
 
-fn teapot_and_spheres() -> (BvhScene, Point3) {
+fn teapot_and_spheres() -> (BvhScene, (f64, f64, f64), Point3) {
     let material = Material::Metal {
         albedo: ColorRgb {
             r: 0.8,
@@ -354,6 +356,7 @@ fn teapot_and_spheres() -> (BvhScene, Point3) {
 
     (
         scene_builder.build(),
+        (1.5799999, 0.30588236, 13.),
         Point3 {
             x: 0.,
             y: 0.,
@@ -362,11 +365,18 @@ fn teapot_and_spheres() -> (BvhScene, Point3) {
     )
 }
 
+
 struct RotateCamera {
     phi: f32,
     theta: f32,
     dist: f32,
     position: Point3,
+}
+
+impl std::fmt::Display for RotateCamera {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{} {} {} {} {} {}", self.phi, self.theta, self.dist, self.position.x, self.position.y, self.position.z)
+    }
 }
 
 impl RotateCamera {
@@ -425,7 +435,7 @@ fn main() {
     std::io::stdin().read_line(&mut s).unwrap();
 
     let input = s.trim(); // Trim whitespace and newlines from the input
-    let (scene, pos) = if input == "a" {
+    let (scene, (phi, theta, dist),  pos) = if input == "a" {
         dragon_scene()
     } else if input.chars().next() == Some('b') {
         big_spheres_scene()
@@ -434,9 +444,9 @@ fn main() {
     };
 
     let mut rot = RotateCamera {
-        phi: 0.,
-        theta: 0.,
-        dist: 10.,
+        phi: phi as f32,
+        theta: theta as f32,
+        dist: dist as f32,
         position: pos,
     };
 
@@ -453,6 +463,10 @@ fn main() {
         .unwrap();
 
     while window.is_open() && !window.is_key_down(Key::Escape) {
+        if window.get_keys().contains(&Key::C) {
+            println!("{rot}");
+        }
+
         if window.get_mouse_down(MouseButton::Left) {
             if !mouse_down {
                 if let Some((xx, yy)) = window.get_mouse_pos(MouseMode::Pass) {
@@ -487,7 +501,7 @@ fn main() {
             renderer.render(&mut buffer, 1);
         }
         let elapsed = now.elapsed();
-        println!("Elapsed: {:.2?}", elapsed);
+        //println!("Elapsed: {:.2?}", elapsed);
 
         window.update_with_buffer(&buffer, WIDTH, HEIGHT).unwrap();
     }
