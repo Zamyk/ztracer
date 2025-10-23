@@ -1,15 +1,16 @@
 use crate::bvh::Bvh;
-use crate::camera::{Ray, Sphere};
 use crate::color::ColorRgb;
 use crate::material::Material;
 use crate::primitive::MaterialId;
-use crate::triangle::TTriangle;
+use crate::ray::Ray;
+use crate::sphere::Sphere;
+use crate::triangle::Triangle;
 
 pub struct SceneBuilder {
     materials: Vec<Material>,
-    triangles: Vec<TTriangle<f64>>,
+    triangles: Vec<Triangle<f64>>,
     triangles_materials: Vec<MaterialId>,
-    spheres: Vec<Sphere>,
+    spheres: Vec<Sphere<f64>>,
     spheres_materials: Vec<MaterialId>,
 }
 
@@ -24,12 +25,12 @@ impl SceneBuilder {
         }
     }
 
-    pub fn add_triangle(&mut self, triangle: TTriangle<f64>, material: MaterialId) {
+    pub fn add_triangle(&mut self, triangle: Triangle<f64>, material: MaterialId) {
         self.triangles.push(triangle);
         self.triangles_materials.push(material);
     }
 
-    pub fn add_sphere(&mut self, sphere: Sphere, material: MaterialId) {
+    pub fn add_sphere(&mut self, sphere: Sphere<f64>, material: MaterialId) {
         self.spheres.push(sphere);
         self.spheres_materials.push(material);
     }
@@ -52,16 +53,16 @@ impl SceneBuilder {
 
 pub struct BvhScene {
     materials: Vec<Material>,
-    triangles: Bvh<f64, TTriangle<f64>>,
-    spheres: Bvh<f64, Sphere>,
+    triangles: Bvh<f64, Triangle<f64>>,
+    spheres: Bvh<f64, Sphere<f64>>,
 }
 
 impl BvhScene {
     pub fn new(
         materials: Vec<Material>,
-        triangles: Vec<TTriangle<f64>>,
+        triangles: Vec<Triangle<f64>>,
         triangles_materials: Vec<MaterialId>,
-        spheres: Vec<Sphere>,
+        spheres: Vec<Sphere<f64>>,
         spheres_materials: Vec<MaterialId>,
     ) -> Self {
         BvhScene {
@@ -71,7 +72,7 @@ impl BvhScene {
         }
     }
 
-    pub fn get_ray_color(&self, ray: Ray, iterations: i32) -> ColorRgb {
+    pub fn get_ray_color(&self, ray: Ray<f64>, iterations: i32) -> ColorRgb {
         if iterations == 0 {
             return ColorRgb {
                 r: 0.0,

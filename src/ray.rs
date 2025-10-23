@@ -1,20 +1,20 @@
 use super::flt::FloatP;
-use super::point::TPoint3;
-use super::vector::TVector3;
+use super::point::Point3;
+use super::vector::Vector3;
 
 #[derive(Copy, Clone, Debug)]
-pub struct TRay<T: FloatP> {
-    pub origin: TPoint3<T>,
-    pub direction: TVector3<T>,
-    pub direction_inverse: TVector3<T>,
+pub struct Ray<T: FloatP> {
+    pub origin: Point3<T>,
+    pub direction: Vector3<T>,
+    pub direction_inverse: Vector3<T>,
 }
 
-impl<T: FloatP> TRay<T> {
-    pub fn new(origin: TPoint3<T>, direction: TVector3<T>) -> TRay<T> {
-        TRay {
+impl<T: FloatP> Ray<T> {
+    pub fn new(origin: Point3<T>, direction: Vector3<T>) -> Ray<T> {
+        Ray {
             origin,
             direction,
-            direction_inverse: TVector3 {
+            direction_inverse: Vector3 {
                 x: T::one(),
                 y: T::one(),
                 z: T::one(),
@@ -22,7 +22,7 @@ impl<T: FloatP> TRay<T> {
         }
     }
 
-    pub fn at(&self, t: T) -> TPoint3<T> {
+    pub fn at(&self, t: T) -> Point3<T> {
         self.origin + self.direction * t
     }
 }

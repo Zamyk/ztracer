@@ -1,0 +1,22 @@
+todo:
+- remove T prefixes for generic stuff
+- add tests
+- reevaluate organization of materials, primitives, bvhs, etc.
+
+new features:
+- matrices for transformations
+- add textures (potentially procedural etc., keep these fast tho!)
+- sky sphere/box
+- lights
+- simd
+- optimizations and profiling (maybe also checking assembly on hot paths!)
+- better bvh SAH, and other optimizations
+- more materials, read about all the different possible things add these
+- metropolis!
+- maybe some denoiser algorithms (could be another project!)
+- regression kind of tests - having saved images to see if they change much - useful for optimizing without breaking stuff
+- performance tests - to see how optimizations work - after adding more of functionality establish test cases and do tests after bigger changes (maybe plot overtime)
+
+Cool sources:
+- ray tracing in one weekend
+- pbrt

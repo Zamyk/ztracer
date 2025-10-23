@@ -1,19 +1,19 @@
 use super::flt::FloatP;
 use super::hit::THit;
-use super::point::TPoint3;
+use super::point::Point3;
 use super::primitive::Primitive;
-use super::ray::TRay;
-use super::vector::TVector3;
+use super::ray::Ray;
+use super::vector::Vector3;
 use crate::bbox::BBox;
 
 #[derive(Clone)]
-pub struct TSphere<T> {
-    pub center: TPoint3<T>,
+pub struct Sphere<T> {
+    pub center: Point3<T>,
     pub radius: T,
 }
 
-impl<T: FloatP> TSphere<T> {
-    pub fn intersect(&self, ray: &TRay<T>, min_t: T) -> Option<THit<T>> {
+impl<T: FloatP> Sphere<T> {
+    pub fn intersect(&self, ray: &Ray<T>, min_t: T) -> Option<THit<T>> {
         let p = ray.origin - self.center;
         let a = ray.direction.dot(&ray.direction);
         let b = ray.direction.dot(&p);
@@ -43,17 +43,17 @@ impl<T: FloatP> TSphere<T> {
     }
 }
 
-impl<T: FloatP> Primitive<T> for TSphere<T> {
+impl<T: FloatP> Primitive<T> for Sphere<T> {
     fn get_bbox(&self) -> BBox<T> {
         BBox {
             bl: self.center
-                - TVector3 {
+                - Vector3 {
                     x: self.radius,
                     y: self.radius,
                     z: self.radius,
                 },
             ur: self.center
-                + TVector3 {
+                + Vector3 {
                     x: self.radius,
                     y: self.radius,
                     z: self.radius,
@@ -61,7 +61,7 @@ impl<T: FloatP> Primitive<T> for TSphere<T> {
         }
     }
 
-    fn intersect(&self, ray: &TRay<T>, min_t: T) -> Option<THit<T>> {
+    fn intersect(&self, ray: &Ray<T>, min_t: T) -> Option<THit<T>> {
         self.intersect(ray, min_t)
     }
 }

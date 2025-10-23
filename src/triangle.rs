@@ -1,24 +1,38 @@
 use crate::bbox::BBox;
 use crate::flt::FloatP;
 use crate::hit::THit;
-use crate::point::TPoint3;
+use crate::point::Point3;
 use crate::primitive::Primitive;
-use crate::ray::TRay;
-use crate::vector::TVector3;
+use crate::ray::Ray;
+use crate::vector::Vector3;
 
 #[derive(Clone)]
 
-pub struct TTriangle<T> {
-    pub v1: TPoint3<T>,
-    pub v2: TPoint3<T>,
-    pub v3: TPoint3<T>,
-    pub n1: TVector3<T>,
-    pub n2: TVector3<T>,
-    pub n3: TVector3<T>,
+pub struct Triangle<T> {
+    pub v1: Point3<T>,
+    pub v2: Point3<T>,
+    pub v3: Point3<T>,
+    pub n1: Vector3<T>,
+    pub n2: Vector3<T>,
+    pub n3: Vector3<T>,
 }
 
-impl<T: FloatP> TTriangle<T> {
-    pub fn intersect(&self, ray: &TRay<T>, min_t: T) -> Option<THit<T>> {
+impl<T: FloatP> Triangle<T> {
+
+    #[allow(dead_code)]
+    pub fn new(v1: Point3<T>, v2: Point3<T>, v3: Point3<T>) -> Self {
+        let normal = (v2 - v1).cross(&(v3 - v2)).normalized();
+        Triangle::<T> {
+            v1,
+            v2,
+            v3,
+            n1: normal,
+            n2: normal,
+            n3: normal,
+        }
+    }
+
+    pub fn intersect(&self, ray: &Ray<T>, min_t: T) -> Option<THit<T>> {
         let e1 = self.v2 - self.v1;
         let e2 = self.v3 - self.v1;
         let normal = e1.cross(&e2);
@@ -57,52 +71,51 @@ impl<T: FloatP> TTriangle<T> {
     }
 }
 
-impl<T: FloatP> Primitive<T> for TTriangle<T> {
+impl<T: FloatP> Primitive<T> for Triangle<T> {
     fn get_bbox(&self) -> BBox<T> {
         BBox::containing(&[self.v1, self.v2, self.v3])
     }
 
-    fn intersect(&self, ray: &TRay<T>, min_t: T) -> Option<THit<T>> {
+    fn intersect(&self, ray: &Ray<T>, min_t: T) -> Option<THit<T>> {
         self.intersect(ray, min_t)
     }
 }
 #[cfg(test)]
 mod tests {
-    use crate::camera::{Point3, Ray, Vector3};
-    use crate::triangle::TTriangle;
+    use super::*;
+    use crate::point::Point3;
+    use crate::triangle::Triangle;
     use rand::random;
-
-    type Triangle = TTriangle<f64>;
 
     #[test]
     fn hit_ok() {
-        let v1 = Point3 {
+        let v1 = Point3::<f64> {
             x: 0.0,
             y: 0.0,
             z: 0.0,
         };
-        let v2 = Point3 {
+        let v2 = Point3::<f64> {
             x: 1.0,
             y: 0.0,
             z: 0.0,
         };
-        let v3 = Point3 {
+        let v3 = Point3::<f64> {
             x: 0.0,
             y: 1.0,
             z: 0.0,
         };
-        let origin = Point3 {
+        let origin = Point3::<f64> {
             x: 0.0,
             y: 0.0,
             z: 1.0,
         };
-        let direction = Vector3 {
+        let direction = Vector3::<f64> {
             x: 0.0,
             y: 0.0,
             z: -1.0,
         };
-        let triangle = Triangle { v1, v2, v3 };
-        let ray = Ray { origin, direction };
+        let triangle = Triangle::<f64>::new(v1, v2, v3);
+        let ray = Ray::<f64>::new(origin, direction);
 
         let hit = triangle.intersect(&ray, 0.);
 
@@ -115,33 +128,33 @@ mod tests {
 
     #[test]
     fn no_ok_on_parallelogram() {
-        let v1 = Point3 {
+        let v1 = Point3::<f64> {
             x: 0.0,
             y: 0.0,
             z: 0.0,
         };
-        let v2 = Point3 {
+        let v2 = Point3::<f64> {
             x: 1.0,
             y: 0.0,
             z: 0.0,
         };
-        let v3 = Point3 {
+        let v3 = Point3::<f64> {
             x: 0.0,
             y: 1.0,
             z: 0.0,
         };
-        let origin = Point3 {
+        let origin = Point3::<f64> {
             x: 0.6,
             y: 0.6,
             z: 1.0,
         };
-        let direction = Vector3 {
+        let direction = Vector3::<f64> {
             x: 0.0,
             y: 0.0,
             z: -1.0,
         };
-        let triangle = Triangle { v1, v2, v3 };
-        let ray = Ray { origin, direction };
+        let triangle = Triangle::<f64>::new(v1, v2, v3);
+        let ray = Ray::<f64>::new(origin, direction);
 
         let hit = triangle.intersect(&ray, 0.);
 
@@ -150,33 +163,33 @@ mod tests {
 
     #[test]
     fn no_ok_on_parallelogram2() {
-        let v1 = Point3 {
+        let v1 = Point3::<f64> {
             x: 0.0,
             y: 0.0,
             z: 0.0,
         };
-        let v2 = Point3 {
+        let v2 = Point3::<f64> {
             x: 1.0,
             y: 0.0,
             z: 0.0,
         };
-        let v3 = Point3 {
+        let v3 = Point3::<f64> {
             x: 0.0,
             y: 1.0,
             z: 0.0,
         };
-        let origin = Point3 {
+        let origin = Point3::<f64> {
             x: 0.0,
             y: 0.0,
             z: 1.0,
         };
-        let direction = Vector3 {
+        let direction = Vector3::<f64> {
             x: 1.0,
             y: 1.0,
             z: -1.0,
         };
-        let triangle = Triangle { v1, v2, v3 };
-        let ray = Ray { origin, direction };
+        let triangle = Triangle::<f64>::new(v1, v2, v3);
+        let ray = Ray::<f64>::new(origin, direction);
 
         let hit = triangle.intersect(&ray, 0.);
 
@@ -185,51 +198,39 @@ mod tests {
 
     #[test]
     fn random_easy() {
-        let v1 = Point3 {
+        let v1 = Point3::<f64> {
             x: 0.0,
             y: 0.0,
             z: 0.0,
         };
-        let v2 = Point3 {
+        let v2 = Point3::<f64> {
             x: 1.0,
             y: 0.0,
             z: 0.0,
         };
-        let v3 = Point3 {
+        let v3 = Point3::<f64> {
             x: 0.0,
             y: 1.0,
             z: 0.0,
         };
 
-        for i in 0..1000 {
+        for _i in 0..1000 {
             let alpha: f64 = random();
             let beta: f64 = random::<f64>() * (1. - alpha);
             let p = v1 + (v2 - v1) * alpha + (v3 - v1) * beta;
             let t = 1f64;
-            let d = Vector3::random_on_sphere(&mut rand::rng());
+            let d = Vector3::<f64>::random_on_sphere(&mut rand::rng());
             let o = p - d * t;
 
-            if (!Triangle { v1, v2, v3 }
-                .intersect(
-                    &Ray {
-                        origin: o,
-                        direction: d,
-                    },
-                    0.,
-                )
-                .is_some())
+            if !Triangle::<f64>::new(v1, v2, v3)
+                .intersect(&Ray::<f64>::new(o, d), 0.)
+                .is_some()
             {
                 println!("{:?} -> {:?}", o, d);
             }
             assert!(
-                Triangle { v1, v2, v3 }
-                    .intersect(
-                        &Ray {
-                            origin: o,
-                            direction: d
-                        },
-                        0.
-                    )
+                Triangle::<f64>::new(v1, v2, v3)
+                    .intersect(&Ray::<f64>::new(o, d), 0.)
                     .is_some()
             )
         }

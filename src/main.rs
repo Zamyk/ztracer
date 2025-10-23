@@ -26,10 +26,13 @@ use renderer::IterativeRenderer;
 const WIDTH: usize = 1200;
 const HEIGHT: usize = 765;
 
+use crate::point::Point3;
 use crate::scene::{BvhScene, SceneBuilder};
+use crate::sphere::Sphere;
+use crate::vector::Vector3;
 use camera::*;
 
-fn dragon_scene() -> (BvhScene, (f64, f64, f64), Point3) {
+fn dragon_scene() -> (BvhScene, (f64, f64, f64), Point3<f64>) {
     match std::env::current_dir() {
         Ok(path) => println!("Current working directory: {}", path.display()),
         Err(e) => eprintln!("Error getting current directory: {}", e),
@@ -94,7 +97,7 @@ fn dragon_scene() -> (BvhScene, (f64, f64, f64), Point3) {
     let ground_radius = 10000.;
 
     builder.add_sphere(
-        Sphere {
+        Sphere::<f64> {
             center: ground_center,
             radius: ground_radius,
         },
@@ -113,7 +116,7 @@ fn dragon_scene() -> (BvhScene, (f64, f64, f64), Point3) {
 }
 
 // taken from Ray Tracing In One Weekend
-fn big_spheres_scene() -> (BvhScene, (f64, f64, f64), Point3) {
+fn big_spheres_scene() -> (BvhScene, (f64, f64, f64), Point3<f64>) {
     let ground_center = Point3 {
         x: 0.,
         y: -1000.,
@@ -259,7 +262,7 @@ fn big_spheres_scene() -> (BvhScene, (f64, f64, f64), Point3) {
     )
 }
 
-fn teapot_and_spheres() -> (BvhScene, (f64, f64, f64), Point3) {
+fn teapot_and_spheres() -> (BvhScene, (f64, f64, f64), Point3<f64>) {
     match std::env::current_dir() {
         Ok(path) => println!("Current working directory: {}", path.display()),
         Err(e) => eprintln!("Error getting current directory: {}", e),
@@ -359,7 +362,7 @@ struct RotateCamera {
     phi: f32,
     theta: f32,
     dist: f32,
-    position: Point3,
+    position: Point3<f64>,
 }
 
 impl std::fmt::Display for RotateCamera {
@@ -393,7 +396,7 @@ impl RotateCamera {
         Camera::new(
             &pos,
             &self.position,
-            &Vector3 {
+            &Vector3::<f64> {
                 x: 0.,
                 y: 1.,
                 z: 0.,

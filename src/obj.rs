@@ -1,8 +1,9 @@
-use super::triangle::TTriangle;
-use crate::camera::{Point3, Vector3};
+use super::triangle::Triangle;
+use crate::point::Point3;
+use crate::vector::Vector3;
 use wavefront_obj;
 
-pub fn parse(path: &str) -> Option<Vec<TTriangle<f64>>> {
+pub fn parse(path: &str) -> Option<Vec<Triangle<f64>>> {
     let obj_contents = std::fs::read_to_string(path)
         .map_err(|e| {
             println!("Error reading OBJ file: {}: {}", path, e);
@@ -21,13 +22,13 @@ pub fn parse(path: &str) -> Option<Vec<TTriangle<f64>>> {
     let obj_set = obj_set.unwrap();
     let obj = &obj_set.objects[0];
 
-    let mut triangles: Vec<TTriangle<f64>> = vec![];
+    let mut triangles: Vec<Triangle<f64>> = vec![];
 
     for shape in &obj.geometry[0].shapes {
         if let wavefront_obj::obj::Primitive::Triangle((i1, _, _), (i2, _, _), (i3, _, _)) =
             shape.primitive
         {
-            let to_point = |i: usize| -> Point3 {
+            let to_point = |i: usize| -> Point3<f64> {
                 Point3 {
                     x: obj.vertices[i].x,
                     y: obj.vertices[i].y,
@@ -35,7 +36,7 @@ pub fn parse(path: &str) -> Option<Vec<TTriangle<f64>>> {
                 }
             };
 
-            let to_normal = |i: usize| -> Vector3 {
+            let to_normal = |i: usize| -> Vector3<f64> {
                 Vector3 {
                     x: obj.normals[i].x,
                     y: obj.normals[i].y,
@@ -51,7 +52,7 @@ pub fn parse(path: &str) -> Option<Vec<TTriangle<f64>>> {
             let n2 = to_normal(i2);
             let n3 = to_normal(i3);
 
-            triangles.push(TTriangle::<f64> {
+            triangles.push(Triangle::<f64> {
                 v1,
                 v2,
                 v3,

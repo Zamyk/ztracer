@@ -1,6 +1,7 @@
-use crate::camera::{Ray, Vector3};
 use crate::color::ColorRgb;
 use crate::hit::THit;
+use crate::ray::Ray;
+use crate::vector::Vector3;
 use num::Float;
 use rand::Rng;
 
@@ -13,10 +14,10 @@ pub enum Material {
 }
 
 impl Material {
-    fn scatter_lambertian(hit: &Hit, albedo: &ColorRgb) -> Option<(Ray, ColorRgb)> {
-        let next_ray = Ray::new(
+    fn scatter_lambertian(hit: &Hit, albedo: &ColorRgb) -> Option<(Ray<f64>, ColorRgb)> {
+        let next_ray = Ray::<f64>::new(
             hit.point,
-            hit.normal + Vector3::random_on_sphere(&mut rand::rng()),
+            hit.normal + Vector3::<f64>::random_on_sphere(&mut rand::rng()),
         );
         if next_ray.direction.near_zero() {
             None
@@ -26,11 +27,11 @@ impl Material {
     }
 
     fn scatter_metal(
-        ray: &Ray,
+        ray: &Ray<f64>,
         hit: &Hit,
         albedo: &ColorRgb,
         fuzz: f64,
-    ) -> Option<(Ray, ColorRgb)> {
+    ) -> Option<(Ray<f64>, ColorRgb)> {
         let directed_normal = if hit.normal.dot(&ray.direction) < 0. {
             hit.normal
         } else {
@@ -38,9 +39,9 @@ impl Material {
         };
 
         let new_direction = ray.direction.reflect(&directed_normal).normalized()
-            + Vector3::random_on_sphere(&mut rand::rng()) * fuzz;
+            + Vector3::<f64>::random_on_sphere(&mut rand::rng()) * fuzz;
         if new_direction.dot(&directed_normal) > 0.0 {
-            Some((Ray::new(hit.point, new_direction), *albedo))
+            Some((Ray::<f64>::new(hit.point, new_direction), *albedo))
         } else {
             None
         }
@@ -52,7 +53,11 @@ impl Material {
         r0 + (1.0 - r0) * (1.0 - cos).powi(5)
     }
 
-    fn scatter_dielectric(ray: &Ray, hit: &Hit, refractive_index: f64) -> Option<(Ray, ColorRgb)> {
+    fn scatter_dielectric(
+        ray: &Ray<f64>,
+        hit: &Hit,
+        refractive_index: f64,
+    ) -> Option<(Ray<f64>, ColorRgb)> {
         let unit_direction = ray.direction.normalized();
 
         let (directed_ri, directed_normal) = if ray.direction.dot(&hit.normal) < 0.0 {
@@ -71,10 +76,10 @@ impl Material {
         } else {
             unit_direction.reflect(&directed_normal)
         };
-        Some((Ray::new(hit.point, direction), ColorRgb::white()))
+        Some((Ray::<f64>::new(hit.point, direction), ColorRgb::white()))
     }
 
-    pub fn scatter(&self, ray: &Ray, hit: &Hit) -> Option<(Ray, ColorRgb)> {
+    pub fn scatter(&self, ray: &Ray<f64>, hit: &Hit) -> Option<(Ray<f64>, ColorRgb)> {
         match self {
             Material::Lambertian { albedo } => Self::scatter_lambertian(hit, albedo),
             Material::Metal { albedo, fuzz } => Self::scatter_metal(ray, hit, albedo, *fuzz),

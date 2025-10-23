@@ -2,21 +2,21 @@ use super::flt::FloatP;
 use std::ops::{Add, Div, DivAssign, Mul, Neg, Sub};
 
 #[derive(Copy, Clone, Debug)]
-pub struct TVector3<T> {
+pub struct Vector3<T> {
     pub x: T,
     pub y: T,
     pub z: T,
 }
 
-impl<T: FloatP> TVector3<T> {
-    pub fn random_on_sphere<T2: rand::Rng>(rng: &mut T2) -> TVector3<T> {
+impl<T: FloatP> Vector3<T> {
+    pub fn random_on_sphere<T2: rand::Rng>(rng: &mut T2) -> Vector3<T> {
         let theta = rng.random::<f64>() * 2. * std::f64::consts::PI;
         let phi = (1. - 2. * rng.random::<f64>()).acos();
         let x = phi.sin() * theta.cos();
         let y = phi.sin() * theta.sin();
         let z = phi.cos();
 
-        TVector3 {
+        Vector3 {
             x: T::value(x),
             y: T::value(y),
             z: T::value(z),
@@ -36,7 +36,7 @@ impl<T: FloatP> TVector3<T> {
         // }
     }
 
-    pub fn random_on_hemisphere<T2: rand::Rng>(rng: &mut T2, normal: &TVector3<T>) -> TVector3<T> {
+    pub fn random_on_hemisphere<T2: rand::Rng>(rng: &mut T2, normal: &Vector3<T>) -> Vector3<T> {
         let v = Self::random_on_sphere(rng);
         if normal.dot(&v) < T::zero() {
             return -v;
@@ -44,7 +44,7 @@ impl<T: FloatP> TVector3<T> {
         v
     }
 
-    pub fn normalized(&self) -> TVector3<T> {
+    pub fn normalized(&self) -> Vector3<T> {
         let mut tmp = *self;
         tmp.normalize();
         tmp
@@ -58,11 +58,11 @@ impl<T: FloatP> TVector3<T> {
         *self /= self.length();
     }
 
-    pub fn dot(&self, oth: &TVector3<T>) -> T {
+    pub fn dot(&self, oth: &Vector3<T>) -> T {
         self.x * oth.x + self.y * oth.y + self.z * oth.z
     }
 
-    pub fn cross(&self, oth: &TVector3<T>) -> TVector3<T> {
+    pub fn cross(&self, oth: &Vector3<T>) -> Vector3<T> {
         Self {
             x: self.y * oth.z - self.z * oth.y,
             y: self.z * oth.x - self.x * oth.z,
@@ -70,11 +70,11 @@ impl<T: FloatP> TVector3<T> {
         }
     }
 
-    pub fn reflect(&self, normal: &TVector3<T>) -> TVector3<T> {
+    pub fn reflect(&self, normal: &Vector3<T>) -> Vector3<T> {
         *self - *normal * T::value(2.) * normal.dot(&self)
     }
 
-    pub fn refract(&self, normal: &TVector3<T>, relative_refractive: T) -> TVector3<T> {
+    pub fn refract(&self, normal: &Vector3<T>, relative_refractive: T) -> Vector3<T> {
         let cos = -self.dot(normal);
         let perpendicular = (*self + *normal * cos) * relative_refractive;
         let parallel = *normal * -(self.dot(&self) - perpendicular.dot(&perpendicular)).sqrt();
@@ -87,7 +87,7 @@ impl<T: FloatP> TVector3<T> {
     }
 }
 
-impl<T: FloatP> Add<TVector3<T>> for TVector3<T> {
+impl<T: FloatP> Add<Vector3<T>> for Vector3<T> {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self {
@@ -99,7 +99,7 @@ impl<T: FloatP> Add<TVector3<T>> for TVector3<T> {
     }
 }
 
-impl<T: FloatP> Sub<TVector3<T>> for TVector3<T> {
+impl<T: FloatP> Sub<Vector3<T>> for Vector3<T> {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self {
@@ -111,7 +111,7 @@ impl<T: FloatP> Sub<TVector3<T>> for TVector3<T> {
     }
 }
 
-impl<T: FloatP> Mul<TVector3<T>> for TVector3<T> {
+impl<T: FloatP> Mul<Vector3<T>> for Vector3<T> {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self {
@@ -123,7 +123,7 @@ impl<T: FloatP> Mul<TVector3<T>> for TVector3<T> {
     }
 }
 
-impl<T: FloatP> Mul<T> for TVector3<T> {
+impl<T: FloatP> Mul<T> for Vector3<T> {
     type Output = Self;
 
     fn mul(self, rhs: T) -> Self {
@@ -135,10 +135,10 @@ impl<T: FloatP> Mul<T> for TVector3<T> {
     }
 }
 
-impl<T: FloatP> Div<TVector3<T>> for TVector3<T> {
+impl<T: FloatP> Div<Vector3<T>> for Vector3<T> {
     type Output = Self;
 
-    fn div(self, rhs: TVector3<T>) -> Self {
+    fn div(self, rhs: Vector3<T>) -> Self {
         Self {
             x: self.x / rhs.x,
             y: self.y / rhs.y,
@@ -147,7 +147,7 @@ impl<T: FloatP> Div<TVector3<T>> for TVector3<T> {
     }
 }
 
-impl<T: FloatP> Div<T> for TVector3<T> {
+impl<T: FloatP> Div<T> for Vector3<T> {
     type Output = Self;
 
     fn div(self, rhs: T) -> Self {
@@ -158,7 +158,7 @@ impl<T: FloatP> Div<T> for TVector3<T> {
         }
     }
 }
-impl<T: FloatP> DivAssign<T> for TVector3<T> {
+impl<T: FloatP> DivAssign<T> for Vector3<T> {
     fn div_assign(&mut self, rhs: T) {
         self.x = self.x / rhs;
         self.y = self.y / rhs;
@@ -166,7 +166,7 @@ impl<T: FloatP> DivAssign<T> for TVector3<T> {
     }
 }
 
-impl<T: FloatP> Neg for TVector3<T> {
+impl<T: FloatP> Neg for Vector3<T> {
     type Output = Self;
 
     fn neg(self) -> Self {
@@ -180,7 +180,6 @@ impl<T: FloatP> Neg for TVector3<T> {
 
 #[cfg(test)]
 mod tests {
-
     #[test]
     fn add() {}
 }

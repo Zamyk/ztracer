@@ -1,20 +1,22 @@
 use super::flt::FloatP;
 use super::hit::THit;
 use super::primitive::{MaterialId, Primitive};
-use super::ray::TRay;
+use super::ray::Ray;
 use crate::bbox::BBox;
-use crate::point::TPoint3;
+use crate::point::Point3;
 
 #[derive(Copy, Clone)]
 struct BvhBox<T: FloatP> {
     bbox: BBox<T>,
     index: usize,
 }
+
 pub struct Bvh<T: FloatP, P: Primitive<T>> {
     tree: Vec<BBox<T>>,
     primitives: Vec<P>,
     materials: Vec<MaterialId>,
 }
+
 impl<T: FloatP, P: Primitive<T>> Bvh<T, P> {
     fn left(i: usize) -> usize {
         i * 2 + 1
@@ -43,12 +45,12 @@ impl<T: FloatP, P: Primitive<T>> Bvh<T, P> {
             .collect();
 
         let empty_box = BBox {
-            bl: TPoint3 {
+            bl: Point3 {
                 x: T::zero(),
                 y: T::zero(),
                 z: T::zero(),
             },
-            ur: TPoint3 {
+            ur: Point3 {
                 x: T::zero(),
                 y: T::zero(),
                 z: T::zero(),
@@ -104,7 +106,7 @@ impl<T: FloatP, P: Primitive<T>> Bvh<T, P> {
         i: usize,
         l: usize,
         r: usize,
-        ray: &TRay<T>,
+        ray: &Ray<T>,
         min_t: T,
     ) -> Option<(THit<T>, MaterialId)> {
         if l == r {
@@ -139,7 +141,7 @@ impl<T: FloatP, P: Primitive<T>> Bvh<T, P> {
         }
     }
 
-    pub fn intersect(&self, ray: &TRay<T>, min_t: T) -> Option<(THit<T>, MaterialId)> {
+    pub fn intersect(&self, ray: &Ray<T>, min_t: T) -> Option<(THit<T>, MaterialId)> {
         if self.primitives.is_empty() {
             None
         } else {

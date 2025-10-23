@@ -1,19 +1,19 @@
 use super::flt::FloatP;
-use super::point::TPoint3;
-use super::ray::TRay;
-use crate::vector::TVector3;
+use super::point::Point3;
+use super::ray::Ray;
+use crate::vector::Vector3;
 
 #[derive(Clone, Copy)]
 pub struct BBox<T> {
-    pub bl: TPoint3<T>,
-    pub ur: TPoint3<T>,
+    pub bl: Point3<T>,
+    pub ur: Point3<T>,
 }
 
 impl<T> BBox<T>
 where
     T: FloatP,
 {
-    pub fn containing(vals: &[TPoint3<T>]) -> Self {
+    pub fn containing(vals: &[Point3<T>]) -> Self {
         let mut min = vals[0];
         let mut max = vals[0];
 
@@ -25,7 +25,7 @@ where
         // so this eps is required to handle axis aligned triangle
         // maybe there is better workaround
         let eps = T::value(1e-9);
-        let eps = TVector3 {
+        let eps = Vector3 {
             x: eps,
             y: eps,
             z: eps,
@@ -35,7 +35,8 @@ where
             ur: max + eps,
         }
     }
-    pub fn intersect(&self, ray: &TRay<T>, min_t: T) -> bool {
+
+    pub fn intersect(&self, ray: &Ray<T>, min_t: T) -> bool {
         let l = (self.bl - ray.origin) * ray.direction_inverse;
         let r = (self.ur - ray.origin) * ray.direction_inverse;
 
@@ -75,30 +76,30 @@ where
         }
     }
 
-    pub fn get_size(&self) -> TVector3<T> {
+    pub fn get_size(&self) -> Vector3<T> {
         self.ur - self.bl
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::bbox::{BBox, Interval};
-    use crate::point::TPoint3;
-    use crate::ray::TRay;
-    use crate::vector::TVector3;
+    use crate::bbox::BBox;
+    use crate::point::Point3;
+    use crate::ray::Ray;
+    use crate::vector::Vector3;
     use rand::{Rng, SeedableRng};
 
     #[test]
     fn random_intersection() {
         let mut rng = rand::rngs::StdRng::seed_from_u64(0);
 
-        for i in 0..1000 {
-            let bl = TPoint3 {
+        for _i in 0..1000 {
+            let bl = Point3 {
                 x: rng.random_range(-10.0..10.0),
                 y: rng.random_range(-10.0..10.0),
                 z: rng.random_range(-10.0..10.0),
             };
-            let ur = TPoint3 {
+            let ur = Point3 {
                 x: rng.random_range(bl.x + 1. ..12.0),
                 y: rng.random_range(bl.y + 1. ..12.0),
                 z: rng.random_range(bl.z + 1. ..12.0),
@@ -106,16 +107,13 @@ mod tests {
             let b = BBox { bl, ur };
 
             // from bl + 0.25 to ur - 0.25
-            let o = TPoint3 {
+            let o = Point3 {
                 x: rng.random_range(bl.x + 0.25..ur.x - 0.25),
                 y: rng.random_range(bl.y + 0.25..ur.y - 0.25),
                 z: rng.random_range(bl.z + 0.25..ur.z - 0.25),
             };
-            let d = TVector3::random_on_sphere(&mut rng);
-            let ray = TRay {
-                origin: o + d * -50.,
-                direction: d,
-            };
+            let d = Vector3::random_on_sphere(&mut rng);
+            let ray = Ray::<f64>::new(o + d * -50., d);
 
             assert!(b.intersect(&ray, 0.));
         }
@@ -125,13 +123,13 @@ mod tests {
     fn random_no_intersection() {
         let mut rng = rand::rngs::StdRng::seed_from_u64(0);
 
-        for i in 0..1000 {
-            let bl = TPoint3 {
+        for _i in 0..1000 {
+            let bl = Point3 {
                 x: rng.random_range(-10.0..10.0),
                 y: rng.random_range(-10.0..10.0),
                 z: rng.random_range(-10.0..10.0),
             };
-            let ur = TPoint3 {
+            let ur = Point3 {
                 x: rng.random_range(bl.x + 1. ..12.0),
                 y: rng.random_range(bl.y + 1. ..12.0),
                 z: rng.random_range(bl.z + 1. ..12.0),
@@ -139,17 +137,14 @@ mod tests {
             let b = BBox { bl, ur };
 
             // from bl + 0.25 to ur - 0.25
-            let o = TPoint3 {
+            let o = Point3 {
                 x: rng.random_range(bl.x + 0.25..ur.x - 0.25),
                 y: rng.random_range(bl.y + 0.25..ur.y - 0.25),
                 z: rng.random_range(bl.z + 0.25..ur.z - 0.25),
             };
 
-            let d = TVector3::random_on_sphere(&mut rng);
-            let ray = TRay {
-                origin: o + d * 50.,
-                direction: d,
-            };
+            let d = Vector3::random_on_sphere(&mut rng);
+            let ray = Ray::<f64>::new(o + d * 50., d);
 
             assert!(!b.intersect(&ray, 0.));
         }
