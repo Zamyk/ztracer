@@ -20,3 +20,44 @@ new features:
 Cool sources:
 - ray tracing in one weekend
 - pbrt
+
+
+
+Textures:
+- where are textures stored?
+
+there could be like
+materials
+textures
+
+or material contains texture
+
+how do we store mapping of texture coordinates?
+
+it could be in primitive?
+it could be additional thing like TextureMapping that somehow can return the u,v coordinates (what about solid textures)
+
+
+Maybe something like this is possible:
+- texture is more like opengl thing may have f64 may have color
+- we add some methods somehwhere to get like u, v, w coords for the textures solid textures use u, v, w normal textures just u, v and solid like none
+- rewrite material somehow so they have everything being texture so we can make textures with changing fuzz or somehing maybe?
+- but also for now materials can just use it for albedo
+
+Then how do we make material access its texture, we can either pass albedo to material
+
+we could have something like that:
+- texture is just something that returns value from coordinates
+- we have 1d 2d 3d textures
+
+now we need to decide:
+- how are texture coordinates mapped
+- how are textures in materials
+
+So we have basic primitive like sphere or triangle how do we know texture coordinates? 
+
+Maybe it could be like that:
+- we somehow have in hit or somewhere else solid and uv texture coordinates
+- then normal textures use some of these so material can do like textures[albedoTextureId].get(hit.textureCoordinates)
+- but we could also add texture which is like mapping so texture uses other texture we can go with shared ownership textures I guess or id based textures
+- 

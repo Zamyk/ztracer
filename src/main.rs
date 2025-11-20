@@ -16,6 +16,8 @@ mod scene;
 mod sphere;
 mod triangle;
 mod vector;
+mod texture;
+mod img;
 
 use color::ColorRgb;
 use material::*;
@@ -31,6 +33,7 @@ use crate::scene::{BvhScene, SceneBuilder};
 use crate::sphere::Sphere;
 use crate::vector::Vector3;
 use camera::*;
+use crate::texture::ProceduralTexture2d;
 
 fn dragon_scene() -> (BvhScene, (f64, f64, f64), Point3<f64>) {
     match std::env::current_dir() {
@@ -103,6 +106,24 @@ fn dragon_scene() -> (BvhScene, (f64, f64, f64), Point3<f64>) {
         },
         ground_material,
     );
+
+    let skybox = img::load_texture("skybox.exr").unwrap();
+    // let skybox = ProceduralTexture2d{f: |uv| -> ColorRgb {
+    //     let y = (std::f64::consts::PI * uv.y).cos();
+    //     let a = 0.5 * (y + 1.0);
+    //     ColorRgb {
+    //         r: 1.,
+    //         g: 1.,
+    //         b: 1.,
+    //     } * (1.0 - a)
+    //         + ColorRgb {
+    //         r: 0.5,
+    //         g: 0.7,
+    //         b: 1.0,
+    //     } * a
+    // } };
+
+    builder.set_skybox(skybox);
 
     (
         builder.build(),
@@ -379,7 +400,7 @@ impl RotateCamera {
     fn rotate(&mut self, dx: f32, dy: f32) {
         self.phi += dx * 6. / WIDTH as f32;
         self.theta += dy * 3. / HEIGHT as f32;
-        self.theta = self.theta.clamp(0., std::f32::consts::PI);
+        //self.theta = self.theta.clamp(0., std::f32::consts::PI);
     }
 
     fn change_dist(&mut self, d: f32) {

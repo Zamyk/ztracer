@@ -83,7 +83,7 @@ impl<T: FloatP> Sub<Vector3<T>> for Point3<T> {
 }
 
 #[derive(Copy, Clone, Debug)]
-pub struct TPoint2<T> {
+pub struct Point2<T> {
     pub x: T,
     pub y: T,
 }

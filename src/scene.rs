@@ -1,10 +1,14 @@
+use wavefront_obj::mtl::Color;
 use crate::bvh::Bvh;
 use crate::color::ColorRgb;
 use crate::material::Material;
+use crate::point::Point2;
 use crate::primitive::MaterialId;
 use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::triangle::Triangle;
+use crate::texture::{ColorTexture, Texture2d};
+use crate::texture::ImageTexture;
 
 pub struct SceneBuilder {
     materials: Vec<Material>,
@@ -12,6 +16,7 @@ pub struct SceneBuilder {
     triangles_materials: Vec<MaterialId>,
     spheres: Vec<Sphere<f64>>,
     spheres_materials: Vec<MaterialId>,
+    skybox: Box<dyn Texture2d<ColorRgb, f64>>
 }
 
 impl SceneBuilder {
@@ -22,7 +27,13 @@ impl SceneBuilder {
             triangles_materials: vec![],
             spheres: vec![],
             spheres_materials: vec![],
+            skybox: Box::new(ColorTexture{color: ColorRgb::white()})
         }
+    }
+
+
+    pub fn set_skybox<T: Texture2d<ColorRgb, f64> + 'static>(&mut self, skybox: T) {
+        self.skybox = Box::new(skybox);
     }
 
     pub fn add_triangle(&mut self, triangle: Triangle<f64>, material: MaterialId) {
@@ -47,6 +58,7 @@ impl SceneBuilder {
             self.triangles_materials,
             self.spheres,
             self.spheres_materials,
+            self.skybox
         )
     }
 }
@@ -55,6 +67,7 @@ pub struct BvhScene {
     materials: Vec<Material>,
     triangles: Bvh<f64, Triangle<f64>>,
     spheres: Bvh<f64, Sphere<f64>>,
+    skybox: Box<dyn Texture2d<ColorRgb, f64>>
 }
 
 impl BvhScene {
@@ -64,11 +77,13 @@ impl BvhScene {
         triangles_materials: Vec<MaterialId>,
         spheres: Vec<Sphere<f64>>,
         spheres_materials: Vec<MaterialId>,
+        skybox: Box<dyn Texture2d<ColorRgb, f64>>,
     ) -> Self {
         BvhScene {
             materials,
             triangles: Bvh::build(triangles, triangles_materials),
             spheres: Bvh::build(spheres, spheres_materials),
+            skybox
         }
     }
 
@@ -106,17 +121,9 @@ impl BvhScene {
                 }
             }
             None => {
-                let a = 0.5 * (ray.direction.normalized().y + 1.0);
-                ColorRgb {
-                    r: 1.,
-                    g: 1.,
-                    b: 1.,
-                } * (1.0 - a)
-                    + ColorRgb {
-                        r: 0.5,
-                        g: 0.7,
-                        b: 1.0,
-                    } * a
+                let u = 0.5 - f64::atan2(ray.direction.z, ray.direction.x) / (2.0 * std::f64::consts::PI);
+                let v = f64::acos(ray.direction.normalized().y) / std::f64::consts::PI;
+                self.skybox.get(&Point2::<f64>{x: u, y: v})
             }
         }
     }

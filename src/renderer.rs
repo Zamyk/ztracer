@@ -2,11 +2,9 @@ use super::scene::BvhScene;
 use crate::WIDTH;
 use crate::camera::Camera;
 use crate::color::{ColorRgb, ColorSrgb};
-use crate::point::TPoint2;
+use crate::point::Point2;
 use rand;
 use rayon::prelude::*;
-
-type Point2 = TPoint2<f64>;
 
 pub struct Renderer {
     camera: Camera,
@@ -35,7 +33,7 @@ impl Renderer {
         }
     }
 
-    fn random_on_square(lower_left: Point2, upper_right: Point2) -> Point2 {
+    fn random_on_square(lower_left: Point2<f64>, upper_right: Point2<f64>) -> Point2<f64> {
         let x = lower_left.x + (upper_right.x - lower_left.x) * rand::random::<f64>();
         let y = lower_left.y + (upper_right.y - lower_left.y) * rand::random::<f64>();
         Point2 { x, y }
