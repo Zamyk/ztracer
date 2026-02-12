@@ -1,4 +1,3 @@
-use wavefront_obj::mtl::Color;
 use crate::bvh::Bvh;
 use crate::color::ColorRgb;
 use crate::material::Material;
@@ -8,7 +7,6 @@ use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::triangle::Triangle;
 use crate::texture::{ColorTexture, Texture2d};
-use crate::texture::ImageTexture;
 
 pub struct SceneBuilder {
     materials: Vec<Material>,

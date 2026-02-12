@@ -1,9 +1,5 @@
-use crate::bbox::BBox;
 use crate::color::ColorRgb;
-use crate::flt::FloatP;
-use crate::hit::THit;
-use crate::point::{Point2, Point3};
-use crate::ray::Ray;
+use crate::point::{Point2};
 
 pub trait Texture2d<T, C>: Sync {
     fn get(&self, uv: &Point2<C>) -> T;
@@ -14,7 +10,7 @@ pub struct ColorTexture {
 }
 
 impl Texture2d<ColorRgb, f64> for ColorTexture {
-    fn get(&self, uv: &Point2<f64>) -> ColorRgb {
+    fn get(&self, _uv: &Point2<f64>) -> ColorRgb {
         self.color
     }
 }

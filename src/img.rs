@@ -1,6 +1,5 @@
 use crate::texture::{ImageTexture, ImageTextureWrapMode};
 use image::{GenericImageView, ImageReader};
-use std::io;
 use crate::color::ColorRgb;
 
 pub fn load_texture(path: &str) -> Option<ImageTexture> {

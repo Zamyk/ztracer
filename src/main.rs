@@ -33,7 +33,6 @@ use crate::scene::{BvhScene, SceneBuilder};
 use crate::sphere::Sphere;
 use crate::vector::Vector3;
 use camera::*;
-use crate::texture::ProceduralTexture2d;
 
 fn dragon_scene() -> (BvhScene, (f64, f64, f64), Point3<f64>) {
     match std::env::current_dir() {
