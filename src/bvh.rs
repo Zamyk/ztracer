@@ -64,13 +64,15 @@ impl<T: FloatP, P: Primitive<T>> Bvh<T, P> {
 
         ans.build_rec(0, &mut boxes);
 
-        let mut new_primitives = vec![ans.primitives[0].clone(); ans.primitives.len()];
-        let mut new_materials = vec![materials[0]; materials.len()];
 
-        for (i, b) in boxes.iter().enumerate() {
-            new_primitives[i] = ans.primitives[b.index].clone();
-            new_materials[i] = materials[b.index];
+        let mut new_primitives = Vec::with_capacity(ans.primitives.len());
+        let mut new_materials = Vec::with_capacity(materials.len());
+
+        for b in boxes {
+            new_primitives.push(ans.primitives[b.index].clone());
+            new_materials.push(materials[b.index]);
         }
+        
         ans.primitives = new_primitives;
         ans.materials = new_materials;
 
@@ -88,11 +90,11 @@ impl<T: FloatP, P: Primitive<T>> Bvh<T, P> {
 
             let size = self.tree[i].get_size();
             if size.x > size.y && size.x > size.z {
-                boxes.sort_by(|a, b| a.bbox.bl.x.partial_cmp(&b.bbox.bl.x).unwrap());
+                boxes.sort_by(|a, b| a.bbox.bl.x.total_cmp(&b.bbox.bl.x));
             } else if size.y > size.z {
-                boxes.sort_by(|a, b| a.bbox.bl.y.partial_cmp(&b.bbox.bl.y).unwrap());
+                boxes.sort_by(|a, b| a.bbox.bl.y.total_cmp(&b.bbox.bl.y));
             } else {
-                boxes.sort_by(|a, b| a.bbox.bl.z.partial_cmp(&b.bbox.bl.z).unwrap());
+                boxes.sort_by(|a, b| a.bbox.bl.z.total_cmp(&b.bbox.bl.z));
             }
 
             let (l, r) = boxes.split_at_mut((boxes.len() + 1) / 2);
