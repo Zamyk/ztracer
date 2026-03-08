@@ -7,8 +7,9 @@ ZTracer - toy ray tracer, made to learn Rust and ray tracing
 
 Features:
 - triangles and spheres
+- Materials: dielectric, lambertian, metal
 - sky boxes
-- Materials:
+- textures (in progress)
 
 Example renderings:
 ![Tteapot](low-poly-teapot.png)
