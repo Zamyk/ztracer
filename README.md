@@ -10,7 +10,12 @@ Features:
 - sky boxes
 - Materials:
 
-Resources used:
+Example renderings:
+![Tteapot](low-poly-teapot.png)
+![Spheres](many-spheres.png)
+![Dragons](three-dragons.png)
+
+
+Resources:
 - Ray Tracing in One Weekend
 - PBRT
-- 
