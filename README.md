@@ -2,7 +2,7 @@ ZTracer - toy ray tracer
 
 - data oriented design
 - BVH
-- parallel rendering using Rayon
+- parallelism with Rayon
 
 Features:
 - triangles and spheres
