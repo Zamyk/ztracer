@@ -1,5 +1,4 @@
-ZTracer - toy ray tracer, made to learn Rust and ray tracing
-
+ZTracer - toy ray tracer
 
 - data oriented design
 - BVH
